@@ -382,7 +382,11 @@ async function irPerguntas() {
     const txt = await chamarIA(`Você é um tutor acadêmico. Crie 4 perguntas de múltipla escolha em português para um estudante de ${estado.nivel} sobre o artigo "${estado.artigo.titulo}". Adapte a dificuldade: IC=compreensão, Mestrado=análise, Doutorado=síntese crítica. Responda APENAS com JSON array válido, sem markdown: [{"pergunta":"texto","opcoes":["A","B","C","D"],"correta":0,"explicacao":"explicação breve"}]`);
     const clean = txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
     const match = clean.match(/\[[\s\S]*\]/);
-    estado.perguntas = JSON.parse(match ? match[0] : clean);
+let parsed = null;
+try { parsed = JSON.parse(clean); } catch(e) {}
+if (!Array.isArray(parsed)) { try { parsed = JSON.parse(match ? match[0] : '[]'); } catch(e) {} }
+if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('JSON inválido');
+estado.perguntas = parsed;
     estado.qAtual = 0; estado.acertos = 0;
     showQ(); show('s-perguntas');
   } catch(e) {
