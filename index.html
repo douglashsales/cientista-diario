@@ -24,6 +24,7 @@
 
     .screen { display: none; }
     .screen.active { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Logo */
     .logo { text-align: center; padding: 2.5rem 0 2rem; }
@@ -221,6 +222,14 @@
     <p class="err" id="err-setup"></p>
 
     <div class="footer">CientistaDiário · Protótipo v0.1</div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="screen" id="s-loading">
+    <div style="text-align:center;padding:4rem 1rem;">
+      <div style="width:36px;height:36px;border:3px solid #eee;border-top-color:#4f6ef7;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;"></div>
+      <p id="loading-msg" style="font-size:15px;color:#888;">Aguarde...</p>
+    </div>
   </div>
 
   <!-- ARTIGO -->
@@ -511,7 +520,7 @@ const DB = {
 };
 
 let nivelAtual = 'IC';
-let estado = { nivel: 'IC', area: 'materiais', dados: null, qAtual: 0, acertos: 0 };
+let estado = { nivel: 'IC', area: 'materiais', artigo: null, perguntas: [], qAtual: 0, acertos: 0, projeto: '' };
 
 function selecionarNivel(nivel, el) {
   nivelAtual = nivel;
@@ -525,63 +534,116 @@ function show(id) {
   window.scrollTo(0, 0);
 }
 
-function iniciar() {
+const API_KEY = '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';
+const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+async function chamarIA(prompt) {
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + API_KEY,
+      'HTTP-Referer': window.location.href
+    },
+    body: JSON.stringify({
+      model: 'google/gemma-3-27b-it:free',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1200
+    })
+  });
+  if (!resp.ok) throw new Error('Erro na API: ' + resp.status);
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+function setLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg;
+  show('s-loading');
+}
+
+function gerarQueryScholar(texto) {
+  const stopwords = ['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','uns','umas','o','a','os','as','e','é','ao','à','se','seu','sua','seus','suas','este','esta','estes','estas','esse','essa','sobre','sob','entre','como','mais','mas','quando','onde','quem','qual','quais','meu','minha','foi','ser','estudo','análise','pesquisa','investigação','avaliação'];
+  const palavras = texto.toLowerCase()
+    .replace(/[^\w\sáàãâéêíóôõúüç]/g, ' ')
+    .split(/\s+/)
+    .filter(p => p.length > 2 && !stopwords.includes(p));
+  return [...new Set(palavras)].slice(0, 6).join(' ');
+}
+
+async function iniciar() {
   estado.nivel = nivelAtual;
   estado.area = document.getElementById('area').value;
   estado.projeto = document.getElementById('projeto').value.trim();
-  const dados = DB[estado.area] && DB[estado.area][estado.nivel];
-  if (!dados) {
-    document.getElementById('err-setup').textContent = 'Combinação ainda não disponível neste protótipo.';
-    return;
-  }
+  estado.perguntas = [];
   document.getElementById('err-setup').textContent = '';
-  estado.dados = dados;
-  const a = dados.artigo;
+
   const areaLabel = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
-  document.getElementById('art-area').textContent = areaLabel + ' · ' + estado.nivel;
-  document.getElementById('art-titulo').textContent = a.titulo;
-  document.getElementById('art-meta').textContent = a.autores + ' — ' + a.resumo;
 
-  const doi = document.getElementById('art-doi');
-  doi.textContent = 'DOI →';
-  doi.href = 'https://doi.org/' + a.doi;
+  setLoading('A IA está buscando um artigo para o seu projeto...');
 
-  const scholarLink = document.getElementById('art-scholar');
-  const projetoLabel = document.getElementById('art-projeto-label');
+  try {
+    const projetoInfo = estado.projeto
+      ? 'O projeto de pesquisa do estudante é: "' + estado.projeto + '".'
+      : 'Área de pesquisa: ' + areaLabel + '.';
 
-  if (estado.projeto) {
-    // Usa a descrição do projeto como query para o Google Acadêmico
-    const stopwords = ['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','uns','umas','o','a','os','as','e','é','ao','à','se','seu','sua','seus','suas','este','esta','estes','estas','esse','essa','sobre','sob','entre','como','mais','mas','quando','onde','quem','qual','quais','meu','minha','foi','ser'];
-    const palavras = estado.projeto
-      .toLowerCase()
-      .replace(/[^\w\sáàãâéêíóôõúüç]/g, ' ')
-      .split(/\s+/)
-      .filter(p => p.length > 2 && !stopwords.includes(p));
-    const query = [...new Set(palavras)].slice(0, 6).join(' ');
+    const prompt = `Você é um orientador acadêmico. ${projetoInfo}
+Sugira UM artigo científico real, relevante e existente para um estudante de ${estado.nivel} em ${areaLabel}.
+O artigo deve existir de verdade e ser encontrável no Google Acadêmico.
+Responda APENAS com JSON válido, sem markdown, sem explicações extras:
+{"titulo":"título exato do artigo","autores":"Sobrenome, A. et al. (ano)","resumo":"2 frases descrevendo o artigo em português","query_scholar":"3 a 5 palavras-chave em inglês ou português para buscar este artigo no Google Acadêmico"}`;
+
+    const raw = await chamarIA(prompt);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const artigo = JSON.parse(clean);
+    estado.artigo = artigo;
+
+    document.getElementById('art-area').textContent = areaLabel + ' · ' + estado.nivel;
+    document.getElementById('art-titulo').textContent = artigo.titulo;
+    document.getElementById('art-meta').textContent = artigo.autores + ' — ' + artigo.resumo;
+
+    const doi = document.getElementById('art-doi');
+    doi.style.display = 'none';
+
+    const query = artigo.query_scholar || gerarQueryScholar(artigo.titulo);
+    const scholarLink = document.getElementById('art-scholar');
     scholarLink.href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(query) + '&hl=pt-BR';
-    projetoLabel.style.display = 'block';
-    projetoLabel.textContent = '🔍 Busca: "' + query + '"';
-  } else {
-    // Sem descrição, usa área + nível como fallback
-    const areaLabel = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
-    const fallbackQuery = areaLabel + ' ' + estado.nivel;
-    scholarLink.href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(fallbackQuery) + '&hl=pt-BR';
-    projetoLabel.style.display = 'none';
-  }
 
-  show('s-artigo');
+    const projetoLabel = document.getElementById('art-projeto-label');
+    projetoLabel.style.display = 'block';
+    projetoLabel.textContent = '🔍 Busca no Scholar: "' + query + '"';
+
+    show('s-artigo');
+  } catch(e) {
+    show('s-setup');
+    document.getElementById('err-setup').textContent = 'Erro ao buscar artigo: ' + e.message + '. Tente novamente.';
+  }
 }
 
-function irPerguntas() {
-  estado.qAtual = 0;
-  estado.acertos = 0;
-  showQ();
-  show('s-perguntas');
+async function irPerguntas() {
+  setLoading('Gerando perguntas personalizadas para o seu nível...');
+  try {
+    const prompt = `Você é um tutor acadêmico. Crie 4 perguntas de múltipla escolha em português para um estudante de ${estado.nivel} sobre o artigo "${estado.artigo.titulo}".
+Adapte a dificuldade: IC = compreensão básica, Mestrado = análise crítica, Doutorado = síntese avançada.
+Responda APENAS com JSON array válido, sem markdown:
+[{"pergunta":"texto da pergunta","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação breve da resposta correta"}]
+O campo "correta" é o índice (0 a 3) da opção correta.`;
+
+    const raw = await chamarIA(prompt);
+    const clean = raw.replace(/```json|```/g, '').trim();
+    estado.perguntas = JSON.parse(clean);
+    estado.qAtual = 0;
+    estado.acertos = 0;
+    showQ();
+    show('s-perguntas');
+  } catch(e) {
+    show('s-artigo');
+    alert('Erro ao gerar perguntas. Tente novamente.');
+  }
 }
 
 function showQ() {
-  const q = estado.dados.perguntas[estado.qAtual];
-  const total = estado.dados.perguntas.length;
+  const q = estado.perguntas[estado.qAtual];
+  const total = estado.perguntas.length;
   document.getElementById('prog').style.width = (estado.qAtual / total * 100) + '%';
   document.getElementById('q-num').textContent = 'Pergunta ' + (estado.qAtual + 1) + ' de ' + total;
   document.getElementById('q-nivel').textContent = estado.nivel;
@@ -600,7 +662,7 @@ function showQ() {
 }
 
 function responder(idx, btn) {
-  const q = estado.dados.perguntas[estado.qAtual];
+  const q = estado.perguntas[estado.qAtual];
   document.querySelectorAll('.option').forEach(function(b) { b.onclick = null; });
   if (idx === q.correta) { btn.classList.add('correct'); estado.acertos++; }
   else { btn.classList.add('wrong'); document.querySelectorAll('.option')[q.correta].classList.add('correct'); }
@@ -613,22 +675,27 @@ function responder(idx, btn) {
 
 function proxima() {
   estado.qAtual++;
-  if (estado.qAtual < estado.dados.perguntas.length) { showQ(); }
+  if (estado.qAtual < estado.perguntas.length) { showQ(); }
   else { mostrarResultado(); }
 }
 
-function mostrarResultado() {
+async function mostrarResultado() {
   const ac = estado.acertos;
-  const tot = estado.dados.perguntas.length;
+  const tot = estado.perguntas.length;
   const pct = ac / tot;
   document.getElementById('res-icon').textContent = pct === 1 ? '🏆' : pct >= 0.5 ? '🎯' : '📚';
   document.getElementById('res-score').textContent = ac + '/' + tot;
-  const f = pct === 1
-    ? 'Sessão perfeita! Você demonstrou excelente compreensão do artigo. Amanhã exploraremos um tema complementar para aprofundar ainda mais.'
-    : pct >= 0.5
-    ? 'Bom desempenho! Você captou os pontos principais. Revise as questões erradas e avance — a consistência é o que constrói a expertise científica.'
-    : 'É o começo da jornada! Leitura de artigos científicos é uma habilidade que se treina com prática diária. Releia as seções de metodologia e resultados.';
-  document.getElementById('res-feedback').textContent = f;
+  setLoading('Preparando seu feedback...');
+  try {
+    const feedback = await chamarIA(`Estudante de ${estado.nivel} acertou ${ac} de ${tot} perguntas sobre "${estado.artigo.titulo}". Dê um feedback motivador e construtivo em 2-3 frases em português.`);
+    document.getElementById('res-feedback').textContent = feedback;
+  } catch(e) {
+    document.getElementById('res-feedback').textContent = pct === 1
+      ? 'Sessão perfeita! Excelente compreensão do artigo.'
+      : pct >= 0.5
+      ? 'Bom desempenho! Continue praticando diariamente.'
+      : 'Continue tentando! A leitura científica melhora com a prática.';
+  }
   show('s-resultado');
 }
 
