@@ -630,7 +630,8 @@ O campo "correta" é o índice (0 a 3) da opção correta.`;
 
     const raw = await chamarIA(prompt);
     const clean = raw.replace(/```json|```/g, '').trim();
-    estado.perguntas = JSON.parse(clean);
+    const match = clean.match(/\[[\s\S]*\]/);
+    estado.perguntas = JSON.parse(match ? match[0] : clean);
     estado.qAtual = 0;
     estado.acertos = 0;
     showQ();
