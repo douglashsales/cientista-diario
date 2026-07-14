@@ -379,8 +379,7 @@ async function iniciar() {
 async function irPerguntas() {
   setLoading('Gerando perguntas personalizadas para o seu nível...');
   try {
-    const txt = await chamarIA(`Você é um tutor acadêmico. Crie 4 perguntas de múltipla escolha em português para um estudante de ${estado.nivel} sobre o artigo "${estado.artigo.titulo}". Adapte a dificuldade: IC=compreensão, Mestrado=análise, Doutorado=síntese crítica. Responda APENAS com JSON array válido, sem markdown: [{"pergunta":"texto","opcoes":["A","B","C","D"],"correta":0,"explicacao":"explicação breve"}]`);
-    const clean = txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
+    const txt = await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${estado.nivel} sobre o artigo "${estado.artigo.titulo}". REGRAS: responda APENAS com um array JSON puro, sem texto antes, sem texto depois, sem markdown, sem backticks. Dificuldade: IC=compreensão básica, Mestrado=análise crítica, Doutorado=síntese avançada. FORMATO EXATO: [{"pergunta":"texto da pergunta aqui","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação curta"}] O campo correta é o índice 0-3 da opção correta.`);const clean = txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
     const match = clean.match(/\[[\s\S]*\]/);
 let parsed = null;
 try { parsed = JSON.parse(clean); } catch(e) {}
