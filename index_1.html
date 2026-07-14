@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CientistaDiário</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1rem;
+      min-height: 100vh;
+      background: #fff;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Logo */
+    .logo { text-align: center; padding: 2.5rem 0 2rem; }
+    .logo .atom { font-size: 48px; margin-bottom: 10px; }
+    .logo h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
+    .logo p { font-size: 14px; color: #888; margin-top: 6px; }
+
+    /* Cards */
+    .card {
+      background: #fafaf8;
+      border: 1px solid #e8e8e4;
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 12px;
+    }
+    .lbl { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+    /* Form elements */
+    select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #1a1a1a;
+      background: #fff;
+      font-family: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    select:focus, textarea:focus { border-color: #4f6ef7; }
+    textarea { resize: none; height: 85px; }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 10px;
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #1a1a1a; color: #fff; border: none; }
+    .btn-primary:hover { background: #333; }
+    .btn-outline { background: transparent; color: #1a1a1a; border: 1.5px solid #ddd; }
+    .btn-outline:hover { background: #f5f5f0; }
+
+    /* Level pills */
+    .nivel-pills { display: flex; gap: 8px; }
+    .nivel-pill {
+      flex: 1; padding: 10px 0;
+      border-radius: 10px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      border: 1.5px solid #ddd;
+      background: #fff; color: #888;
+      text-align: center; transition: all 0.15s;
+    }
+    .nivel-pill.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+    /* Streak bar */
+    .streak-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff8f0; border: 1px solid #ffe0b2;
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
+    }
+    .streak-num { font-size: 22px; font-weight: 700; color: #f57c00; }
+    .streak-label { font-size: 13px; color: #888; }
+
+    /* Article card */
+    .article-card {
+      background: #fafaf8; border: 1px solid #e8e8e4;
+      border-radius: 14px; padding: 1.25rem; margin-bottom: 16px;
+    }
+    .tag {
+      display: inline-block; background: #eef2ff; color: #4f6ef7;
+      font-size: 11px; font-weight: 600; padding: 4px 10px;
+      border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .article-title { font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.45; margin-bottom: 10px; }
+    .article-meta { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 8px; }
+    .doi-link { font-size: 12px; color: #4f6ef7; display: block; word-break: break-all; text-decoration: none; }
+    .doi-link:hover { text-decoration: underline; }
+
+    .info-pill {
+      display: inline-block; background: #f0fdf4; color: #16a34a;
+      font-size: 12px; font-weight: 500; padding: 6px 12px;
+      border-radius: 20px; margin-bottom: 16px; border: 1px solid #bbf7d0;
+    }
+
+    /* Progress */
+    .progress-bar {
+      height: 5px; background: #f0f0f0;
+      border-radius: 3px; margin-bottom: 24px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: #4f6ef7;
+      border-radius: 3px; transition: width 0.4s ease;
+    }
+
+    /* Questions */
+    .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .q-num { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+    .q-nivel { font-size: 11px; color: #4f6ef7; font-weight: 600; background: #eef2ff; padding: 3px 8px; border-radius: 6px; }
+    .q-text { font-size: 16px; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin-bottom: 18px; }
+
+    .option {
+      display: block; width: 100%; text-align: left;
+      padding: 13px 16px; background: #fafaf8;
+      border: 1.5px solid #e8e8e4; border-radius: 12px;
+      font-size: 14px; color: #1a1a1a; cursor: pointer;
+      margin-bottom: 10px; font-family: inherit;
+      transition: all 0.15s; line-height: 1.4;
+    }
+    .option:hover { background: #f0f0f0; border-color: #ccc; }
+    .option.correct { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+    .option.wrong { background: #fff1f2; border-color: #fca5a5; color: #dc2626; }
+
+    .expl {
+      font-size: 13px; color: #555;
+      background: #f8f9ff; border: 1px solid #e0e7ff;
+      border-radius: 10px; padding: 12px 14px;
+      margin-top: 10px; line-height: 1.55;
+    }
+    .expl::before { content: '💡 '; }
+
+    /* Result */
+    .result-wrap { text-align: center; padding: 2rem 0; }
+    .result-icon { font-size: 56px; margin-bottom: 12px; }
+    .result-score { font-size: 42px; font-weight: 700; color: #1a1a1a; }
+    .result-sub { font-size: 14px; color: #888; margin-top: 4px; margin-bottom: 24px; }
+    .result-feedback {
+      background: #fafaf8; border: 1px solid #e8e8e4;
+      border-radius: 14px; padding: 1.25rem;
+      font-size: 14px; color: #555; line-height: 1.65;
+      text-align: left; margin-bottom: 16px;
+    }
+
+    /* Section title */
+    .section-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
+
+    /* Error */
+    .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 11px; color: #ccc; padding: 24px 0 8px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SETUP -->
+  <div class="screen active" id="s-setup">
+    <div class="logo">
+      <div class="atom">⚛️</div>
+      <h1>CientistaDiário</h1>
+      <p>Sua sessão de pesquisa diária</p>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Nível acadêmico</div>
+      <div class="nivel-pills">
+        <button class="nivel-pill selected" onclick="selecionarNivel('IC', this)">IC</button>
+        <button class="nivel-pill" onclick="selecionarNivel('Mestrado', this)">Mestrado</button>
+        <button class="nivel-pill" onclick="selecionarNivel('Doutorado', this)">Doutorado</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Área de pesquisa</div>
+      <select id="area">
+        <option value="materiais">Ciência dos Materiais</option>
+        <option value="biologia">Biologia</option>
+        <option value="quimica">Química</option>
+        <option value="fisica">Física</option>
+        <option value="engenharia">Engenharia</option>
+        <option value="computacao">Ciência da Computação</option>
+        <option value="medicina">Medicina</option>
+        <option value="agronomia">Agronomia</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary" onclick="iniciar()">Iniciar sessão de hoje →</button>
+    <p class="err" id="err-setup"></p>
+
+    <div class="footer">CientistaDiário · Protótipo v0.1</div>
+  </div>
+
+  <!-- ARTIGO -->
+  <div class="screen" id="s-artigo">
+    <div class="streak-bar">
+      <span class="streak-num">🔥 1</span>
+      <span class="streak-label">dia de sequência</span>
+    </div>
+    <div class="section-title">Artigo de hoje</div>
+    <div class="article-card">
+      <span class="tag" id="art-area">—</span>
+      <p class="article-title" id="art-titulo">—</p>
+      <p class="article-meta" id="art-meta">—</p>
+      <a class="doi-link" id="art-doi" href="#" target="_blank">—</a>
+    </div>
+    <span class="info-pill">📖 Leia o artigo antes de continuar</span>
+    <button class="btn btn-primary" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
+    <button class="btn btn-outline" onclick="voltarSetup()">Trocar configuração</button>
+  </div>
+
+  <!-- PERGUNTAS -->
+  <div class="screen" id="s-perguntas">
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div class="q-header">
+      <span class="q-num" id="q-num">Pergunta 1 de 4</span>
+      <span class="q-nivel" id="q-nivel">IC</span>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div id="opts"></div>
+    <div id="expl-box"></div>
+    <button class="btn btn-primary" id="btn-prox" style="display:none;margin-top:14px" onclick="proxima()">Próxima →</button>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="screen" id="s-resultado">
+    <div class="result-wrap">
+      <div class="result-icon" id="res-icon">🎉</div>
+      <div class="result-score" id="res-score">0/4</div>
+      <div class="result-sub">perguntas certas</div>
+    </div>
+    <div class="result-feedback" id="res-feedback"></div>
+    <button class="btn btn-primary" onclick="voltarSetup()">Nova sessão →</button>
+    <div class="footer">CientistaDiário · Protótipo v0.1</div>
+  </div>
+
+</div>
+
+<script>
+const DB = {
+  materiais: {
+    IC: {
+      artigo: { titulo: "Síntese e caracterização de nanopartículas de TiO₂ para aplicações fotocatalíticas", autores: "Silva et al., 2022", doi: "10.1016/j.jcat.2022.01.015", resumo: "Estudo da síntese de nanopartículas de TiO₂ via sol-gel, avaliando o efeito da temperatura de calcinação nas propriedades estruturais e fotocatalíticas para degradação de corantes." },
+      perguntas: [
+        { pergunta: "Qual é o principal objetivo do estudo?", opcoes: ["Sintetizar TiO₂ e avaliar suas propriedades fotocatalíticas","Produzir corantes industriais sustentáveis","Estudar poluição por metais pesados","Desenvolver baterias com TiO₂"], correta: 0, explicacao: "O artigo foca na síntese de TiO₂ e avaliação fotocatalítica para degradação de corantes." },
+        { pergunta: "Qual método de síntese foi utilizado?", opcoes: ["Co-precipitação","Sol-gel","Deposição química de vapor","Moagem mecânica"], correta: 1, explicacao: "O método sol-gel permite controle preciso da microestrutura das nanopartículas de TiO₂." },
+        { pergunta: "O que foi avaliado como variável principal?", opcoes: ["Pressão de síntese","Tipo de solvente","Temperatura de calcinação","Concentração de dopantes"], correta: 2, explicacao: "A temperatura de calcinação influencia a fase cristalina (anatase/rutilo) e a área superficial do TiO₂." },
+        { pergunta: "Para qual aplicação as nanopartículas foram testadas?", opcoes: ["Catálise industrial","Degradação de corantes","Armazenamento de energia","Sensores de gás"], correta: 1, explicacao: "A degradação fotocatalítica de corantes é uma das principais aplicações do TiO₂ na área ambiental." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Efeito da dopagem com nitrogênio nas propriedades ópticas e fotocatalíticas do TiO₂ sob luz visível", autores: "Oliveira et al., 2023", doi: "10.1039/D3TA01234A", resumo: "Investigação da dopagem de TiO₂ com nitrogênio e seus efeitos no band gap e na eficiência fotocatalítica sob luz visível para tratamento de efluentes." },
+      perguntas: [
+        { pergunta: "Qual a principal motivação para dopar TiO₂ com nitrogênio?", opcoes: ["Aumentar a densidade","Reduzir o band gap para ativação por luz visível","Melhorar a resistência mecânica","Aumentar a temperatura de fusão"], correta: 1, explicacao: "A dopagem com N reduz o band gap do TiO₂ (~3,2 eV) para a faixa do visível (~2,4 eV)." },
+        { pergunta: "Qual gap na literatura este trabalho preenche?", opcoes: ["Falta de estudos sobre TiO₂ puro","Ausência de dados sob luz UV","Limitação do TiO₂ convencional à faixa UV","Custo elevado do sol-gel"], correta: 2, explicacao: "O TiO₂ puro só absorve UV (~5% da luz solar), limitando aplicações práticas em condições ambientais." },
+        { pergunta: "Como a dopagem com N modifica a estrutura eletrônica?", opcoes: ["Cria estados 2p do N acima da banda de valência","Remove elétrons da banda de condução","Aumenta a largura da banda proibida","Elimina defeitos de superfície"], correta: 0, explicacao: "Os estados 2p do N inserem níveis acima da banda de valência do O 2p, reduzindo a energia de fotoativação." },
+        { pergunta: "Qual a relação dos resultados com tratamento de efluentes?", opcoes: ["Nenhuma relação","Permite usar luz solar para degradar poluentes","Reduz reagentes químicos no tratamento","Substitui tratamento biológico"], correta: 1, explicacao: "A atividade sob luz visível viabiliza o uso de radiação solar natural, tornando o processo mais econômico." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Heterojunção TiO₂/g-C₃N₄: mecanismo de transferência de carga e eficiência quântica em fotocatálise avançada", autores: "Ferreira et al., 2024", doi: "10.1021/acscatal.4c00891", resumo: "Análise mecanística da transferência de carga em heterojunções Z-scheme entre TiO₂ e g-C₃N₄, com determinação da eficiência quântica aparente e correlação com parâmetros estruturais da interface." },
+      perguntas: [
+        { pergunta: "Quais são as limitações da eficiência quântica aparente (AQE)?", opcoes: ["Não mede atividade sob luz policromática","Depende da geometria do reator e distribuição espectral, dificultando comparações","Válida apenas para catalisadores puros","Subestima a transferência de carga interfacial"], correta: 1, explicacao: "A AQE depende das condições experimentais específicas, limitando a reprodutibilidade entre grupos de pesquisa." },
+        { pergunta: "Como o trabalho se posiciona no debate mecanismo tipo-II vs Z-scheme?", opcoes: ["Confirma exclusivamente o tipo-II","Propõe evidências para Z-scheme via análise de espécies reativas","Descarta ambos em favor de transferência direta","Não aborda este debate"], correta: 1, explicacao: "O Z-scheme preserva maior poder redox/oxidante; evidências via ESR e capturadores são a abordagem mais robusta." },
+        { pergunta: "Que lacunas o estudo deixa abertas?", opcoes: ["A síntese de g-C₃N₄ está completamente otimizada","Estabilidade sob irradiação prolongada e em efluentes reais permanece pouco explorada","Os parâmetros de transferência foram completamente elucidados","Não há lacunas relevantes"], correta: 1, explicacao: "Estudos mecanísticos controlados raramente abordam estabilidade de longo prazo e interferentes reais." },
+        { pergunta: "Como posicionar este artigo em uma revisão sobre fotocatálise?", opcoes: ["Como referência sobre TiO₂ puro","Como contribuição mecanística em heterojunções, complementando estudos de escalonamento","Como único trabalho necessário para fundamentar a área","Como referência histórica superada"], correta: 1, explicacao: "Trabalhos mecanísticos aprofundados são alicerces teóricos, mas precisam ser complementados por estudos de aplicação." }
+      ]
+    }
+  },
+  biologia: {
+    IC: {
+      artigo: { titulo: "Expressão de proteínas de choque térmico (HSPs) em soja sob estresse hídrico", autores: "Costa et al., 2021", doi: "10.1016/j.plantsci.2021.110903", resumo: "Avaliação da expressão de HSPs 70 e 90 em cultivares de soja sob déficit hídrico progressivo, correlacionando a expressão com indicadores fisiológicos de tolerância ao estresse." },
+      perguntas: [
+        { pergunta: "O que são proteínas de choque térmico (HSPs)?", opcoes: ["Pigmentos fotossintéticos","Proteínas produzidas em resposta a estresses para proteger outras proteínas","Hormônios vegetais de crescimento","Enzimas do metabolismo do nitrogênio"], correta: 1, explicacao: "HSPs são chaperonas moleculares que auxiliam na manutenção da estrutura proteica sob estresse." },
+        { pergunta: "Por que a soja foi escolhida como modelo?", opcoes: ["Por ser resistente a qualquer estresse","Por ser cultura de alta relevância econômica e sensível a déficit hídrico","Por não produzir HSPs normalmente","Por crescer sem água"], correta: 1, explicacao: "A soja é uma das principais culturas globais e o estresse hídrico é o principal limitante de produtividade." },
+        { pergunta: "Qual a relação entre HSPs e tolerância ao estresse?", opcoes: ["Maior expressão indica menor tolerância","Maior expressão está associada a maior proteção celular","HSPs causam o estresse hídrico","HSPs impedem a absorção de água"], correta: 1, explicacao: "Cultivares com maior indução de HSPs tendem a manter a integridade proteica por mais tempo sob déficit hídrico." },
+        { pergunta: "O que os autores mediram para correlacionar com a expressão de HSPs?", opcoes: ["Apenas a altura das plantas","Indicadores fisiológicos de tolerância ao estresse","O sabor dos grãos","A velocidade de germinação"], correta: 1, explicacao: "A correlação com parâmetros fisiológicos dá significado funcional à expressão gênica observada." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Microbioma rizosférico e promoção de crescimento: interações entre Bacillus spp. e cultivares de milho", autores: "Ribeiro et al., 2023", doi: "10.1007/s11104-023-06234-1", resumo: "Caracterização da diversidade do microbioma rizosférico de milho e avaliação do potencial de Bacillus como promotor de crescimento via fixação de nitrogênio, solubilização de fosfato e fitohormônios." },
+      perguntas: [
+        { pergunta: "Qual gap este trabalho aborda?", opcoes: ["Ausência de estudos sobre milho","Falta de caracterização integrada do microbioma e mecanismos de promoção de crescimento","Desconhecimento sobre bactérias no solo","Falta de métodos para cultivar Bacillus"], correta: 1, explicacao: "A maioria dos estudos avalia isolados ou microbioma separadamente — a integração é o diferencial do trabalho." },
+        { pergunta: "Por que Bacillus é de interesse para promoção de crescimento?", opcoes: ["Por ser patogênico a daninhas","Por formar endósporos e produzir substâncias bioativas benéficas","Por eliminar outros microrganismos","Por aumentar absorção de água exclusivamente"], correta: 1, explicacao: "A esporulação garante sobrevivência em formulações comerciais e a versatilidade metabólica permite múltiplos mecanismos." },
+        { pergunta: "Como a análise metagenômica complementa o estudo de isolados?", opcoes: ["Não complementa","Revela diversidade total incluindo microrganismos não cultiváveis","Substitui completamente o cultivo","Apenas confirma o que já é conhecido"], correta: 1, explicacao: "Menos de 1% dos microrganismos do solo são cultiváveis — a metagenômica captura a diversidade real." },
+        { pergunta: "Qual a implicação prática dos resultados?", opcoes: ["Eliminar fertilizantes imediatamente","Desenvolver inoculantes que reduzam dependência de insumos sintéticos","Substituir o milho por outras culturas","Aumentar agrotóxicos"], correta: 1, explicacao: "Inoculantes baseados em Bacillus têm potencial de reduzir custos e impacto ambiental da produção agrícola." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Plasticidade epigenética e adaptação local em Arabidopsis: metilação diferencial do DNA em gradientes altitudinais", autores: "Carvalho et al., 2024", doi: "10.1111/mec.17089", resumo: "Análise de metilação diferencial do DNA por WGBS em populações naturais de Arabidopsis em gradientes altitudinais, investigando a contribuição da variação epigenética à adaptação local." },
+      perguntas: [
+        { pergunta: "Quais são as limitações de inferir adaptação local a partir de metilação do DNA?", opcoes: ["A metilação não varia entre populações","A causalidade entre variação epigenética e fenótipo adaptativo é difícil de estabelecer sem manipulação direta","WGBS não detecta metilação em CpG","Populações naturais são geneticamente idênticas"], correta: 1, explicacao: "Correlação entre metilação e gradiente ambiental não implica causalidade — epialelos podem ser geneticamente condicionados." },
+        { pergunta: "Como o trabalho se posiciona no debate sobre herança epigenética transgeracional?", opcoes: ["Confirma definitivamente a herança epigenética","Fornece evidências correlacionais que justificam experimentos intergeracionais, sem estabelecer herança","Descarta herança epigenética em Arabidopsis","Demonstra que variação epigenética é apenas ambiental"], correta: 1, explicacao: "Distinguir plasticidade reversível de herança estável requer cruzamentos controlados — estudos populacionais não fornecem isso." },
+        { pergunta: "Que implicações o uso de WGBS em campo traz para a reprodutibilidade?", opcoes: ["É equivalente ao laboratório","Variação no estágio de desenvolvimento e contaminação de DNA introduzem ruído confundível com sinal biológico","WGBS não é aplicável a amostras de campo","A reprodutibilidade é garantida pelo tamanho amostral"], correta: 1, explicacao: "Desafios técnicos da epigenômica de campo raramente são discutidos com profundidade suficiente nas seções de métodos." },
+        { pergunta: "Como integrar esses achados em uma revisão sobre evolução epigenética?", opcoes: ["Como evidência de que epigenética substitui seleção genética","Como peça de um mosaico de evidências para plasticidade adaptativa, com ressalvas sobre causalidade e herança","Como trabalho isolado","Como referência apenas metodológica"], correta: 1, explicacao: "A síntese crítica de evidências correlacionais com estudos funcionais é o que diferencia uma revisão de nível doutoral." }
+      ]
+    }
+  },
+  quimica: {
+    IC: {
+      artigo: { titulo: "Síntese verde de nanopartículas de prata usando extrato de Camellia sinensis", autores: "Almeida et al., 2022", doi: "10.1016/j.arabjc.2022.103856", resumo: "Produção de AgNPs com extrato aquoso de chá verde como agente redutor, com caracterização por UV-Vis, DRX e TEM e avaliação da atividade antimicrobiana." },
+      perguntas: [
+        { pergunta: "O que diferencia a síntese verde de métodos convencionais?", opcoes: ["Usa temperatura mais alta","Usa reagentes biológicos naturais em vez de químicos tóxicos","É mais cara e complexa","Produz partículas maiores"], correta: 1, explicacao: "Síntese verde usa extratos naturais como agentes redutores, evitando reagentes tóxicos e resíduos perigosos." },
+        { pergunta: "Qual técnica confirmou a formação das nanopartículas?", opcoes: ["Apenas medição de pH","UV-Vis, DRX e TEM","Análise sensorial","Cromatografia gasosa"], correta: 1, explicacao: "UV-Vis detecta a ressonância plasmônica de superfície, DRX confirma a estrutura cristalina e TEM revela a morfologia." },
+        { pergunta: "Qual propriedade das AgNPs foi avaliada?", opcoes: ["Condutividade elétrica","Atividade antimicrobiana","Fluorescência","Magnetismo"], correta: 1, explicacao: "AgNPs são amplamente estudadas por sua potente atividade antimicrobiana com aplicações em medicina e embalagens." },
+        { pergunta: "Por que o extrato de chá verde foi escolhido?", opcoes: ["Por ser o mais barato","Por conter polifenóis com capacidade redutora e estabilizadora","Por ser incolor","Por não reagir com a prata"], correta: 1, explicacao: "Polifenóis do chá verde convertem Ag⁺ em Ag⁰ e estabilizam as nanopartículas formadas." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Catalisadores de paládio suportados em MOFs para reações de acoplamento C-C", autores: "Mendes et al., 2023", doi: "10.1039/D3CY00456A", resumo: "Síntese de catalisadores Pd@MOF e avaliação em reações de Suzuki-Miyaura, investigando o papel do suporte metalo-orgânico na estabilidade e reciclabilidade do catalisador." },
+      perguntas: [
+        { pergunta: "Qual reação de acoplamento C-C foi avaliada?", opcoes: ["Reação de Heck","Suzuki-Miyaura","Buchwald-Hartwig","Sonogashira"], correta: 1, explicacao: "A reação de Suzuki-Miyaura é uma das mais importantes para formação de ligações C-C na síntese orgânica." },
+        { pergunta: "Que vantagem os MOFs oferecem como suporte para Pd?", opcoes: ["São mais baratos que sílica","Alta área superficial, porosidade controlada e interação específica metal-suporte","São mais fáceis de sintetizar","Dissolvem em água facilmente"], correta: 1, explicacao: "MOFs combinam alta área superficial com interação específica entre Pd e o framework, melhorando dispersão e estabilidade." },
+        { pergunta: "Qual propriedade catalítica foi destacada como vantagem do sistema?", opcoes: ["Alta temperatura necessária","Reciclabilidade do catalisador","Necessidade de solventes tóxicos","Baixa seletividade"], correta: 1, explicacao: "Reciclabilidade é critério central de sustentabilidade — catalisadores heterogêneos bem projetados podem ser reutilizados múltiplas vezes." },
+        { pergunta: "Qual gap o trabalho aborda?", opcoes: ["Ausência de catalisadores de Pd","Falta de compreensão do papel do suporte MOF na estabilidade catalítica","Reações de Suzuki desconhecidas","Custo do Pd não considerado antes"], correta: 1, explicacao: "O papel específico da estrutura do MOF na estabilização do Pd e prevenção de sinterização ainda é pouco compreendido." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Mecanismo de transferência de próton em catálise enzimática: tunelamento quântico em hidratases", autores: "Santos et al., 2024", doi: "10.1021/jacs.4c02341", resumo: "Estudo computacional QM/MM do mecanismo de transferência de próton em hidratases, investigando a contribuição do tunelamento quântico para a eficiência catalítica enzimática via KIE." },
+      perguntas: [
+        { pergunta: "Qual é a limitação de cálculos clássicos para modelar transferência de próton?", opcoes: ["São muito rápidos","Não capturam efeitos de tunelamento quântico significativos para partículas leves como prótons","São imprecisos para moléculas grandes","Não funcionam em enzimas"], correta: 1, explicacao: "O tunelamento quântico de prótons é relevante em baixas barreiras de energia — métodos clássicos subestimam as constantes de velocidade." },
+        { pergunta: "Como o efeito de isótopo cinético (KIE) evidencia tunelamento quântico?", opcoes: ["KIE > 7 é compatível com tunelamento, excedendo o valor clássico esperado","KIE menor que 1 indica tunelamento","KIE não tem relação com tunelamento","KIE só é medível em enzimas desnaturadas"], correta: 0, explicacao: "KIE elevados (>7) indicam que o próton atravessa a barreira por tunelamento — evidência experimental central." },
+        { pergunta: "Qual a contribuição metodológica da abordagem QM/MM?", opcoes: ["Trata todo o sistema quânticamente","Trata o sítio ativo quânticamente e o ambiente proteico classicamente, equilibrando precisão e custo computacional","Elimina a necessidade de dados experimentais","É menos preciso que DFT puro para enzimas"], correta: 1, explicacao: "QM/MM divide o sistema em região quântica (sítio ativo) e clássica (proteína/solvente), equilibrando precisão e viabilidade." },
+        { pergunta: "Como posicionar este trabalho em revisão sobre biocatálise computacional?", opcoes: ["Como único método necessário para estudar enzimas","Como contribuição mecanística conectando estrutura eletrônica e eficiência catalítica, a integrar com dados experimentais","Como referência histórica superada","Como trabalho aplicado sem relevância mecanística"], correta: 1, explicacao: "Estudos computacionais mecanísticos têm maior impacto quando integrados com evidências experimentais complementares." }
+      ]
+    }
+  },
+  fisica: {
+    IC: {
+      artigo: { titulo: "Propriedades magnéticas de nanopartículas de Fe₃O₄ sintetizadas por coprecipitação", autores: "Lima et al., 2021", doi: "10.1016/j.jmmm.2021.168437", resumo: "Síntese de nanopartículas de magnetita por coprecipitação e caracterização das propriedades magnéticas por VSM, avaliando o efeito do tamanho de partícula no comportamento superparamagnético." },
+      perguntas: [
+        { pergunta: "O que é superparamagnetismo?", opcoes: ["Magnetismo permanente em materiais bulk","Comportamento magnético de nanopartículas que se alinham com campo externo mas não retêm magnetização","Propriedade exclusiva de ligas metálicas","Fenômeno observado apenas em temperaturas criogênicas"], correta: 1, explicacao: "Nanopartículas superparamagnéticas se magnetizam em campo externo mas perdem a magnetização ao removê-lo, sem histerese." },
+        { pergunta: "Qual técnica mediu as propriedades magnéticas?", opcoes: ["Difratometria de raios X","VSM (Magnetometria de amostra vibrante)","Espectroscopia Raman","Microscopia eletrônica de varredura"], correta: 1, explicacao: "O VSM mede a magnetização em função do campo aplicado, fornecendo curvas de histerese e magnetização de saturação." },
+        { pergunta: "Como o tamanho de partícula influencia o comportamento magnético?", opcoes: ["Partículas maiores são sempre superparamagnéticas","Partículas abaixo de um tamanho crítico tornam-se superparamagnéticas","O tamanho não afeta as propriedades magnéticas","Partículas menores têm maior campo coercivo"], correta: 1, explicacao: "Abaixo do tamanho crítico de domínio único (~20 nm para Fe₃O₄), as nanopartículas exibem comportamento superparamagnético." },
+        { pergunta: "Qual método de síntese foi utilizado?", opcoes: ["Sol-gel","Coprecipitação","Ablação a laser","Moagem de alta energia"], correta: 1, explicacao: "A coprecipitação é o método mais simples e escalável para síntese de nanopartículas de óxidos magnéticos em meio aquoso." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Transporte de elétrons em heterojunções grafeno/MoS₂: efeitos de interface e tensão mecânica", autores: "Pires et al., 2023", doi: "10.1021/acs.nanolett.3c01876", resumo: "Investigação do transporte eletrônico em heterojunções grafeno/MoS₂ por medidas de efeito Hall e espectroscopia Raman sob strain mecânico, correlacionando modificações na estrutura de bandas com a mobilidade de portadores." },
+      perguntas: [
+        { pergunta: "Qual o papel do MoS₂ como semicondutor 2D nessas heterojunções?", opcoes: ["Funciona como isolante elétrico","Fornece band gap sintonizável e alta mobilidade de portadores na junção com grafeno","Apenas aumenta a espessura do dispositivo","Serve como substrato passivo"], correta: 1, explicacao: "O MoS₂ monolayer tem band gap direto de ~1,8 eV, tornando-o atrativo para transistores e fotodetectores." },
+        { pergunta: "Como o strain mecânico modifica as propriedades eletrônicas do MoS₂?", opcoes: ["Não afeta as propriedades eletrônicas","Modifica a estrutura de bandas, podendo converter o band gap de direto a indireto e alterar a mobilidade","Apenas aumenta a resistência elétrica","Elimina o band gap do material"], correta: 1, explicacao: "Strain no MoS₂ modifica as distâncias Mo-S, alterando a sobreposição de orbitais e a estrutura de bandas." },
+        { pergunta: "Qual gap o trabalho aborda?", opcoes: ["Existência de grafeno e MoS₂","Ausência de compreensão dos efeitos de interface e strain no transporte combinado das heterojunções","Técnicas de medição de efeito Hall","Propriedades do grafeno isolado"], correta: 1, explicacao: "O comportamento emergente na interface grafeno/MoS₂ sob deformação difere das propriedades individuais — esse gap é central." },
+        { pergunta: "Por que usar espectroscopia Raman junto com medidas de transporte?", opcoes: ["Para medir a resistividade diretamente","Para correlacionar modificações estruturais do strain com propriedades de transporte eletrônico","Para sintetizar as amostras","Apenas por convenção experimental"], correta: 1, explicacao: "Raman monitora o strain via deslocamento de picos, conectando estrutura e propriedades eletrônicas medidas." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Emaranhamento quântico em qubits supercondutores: decoerência e mitigação de erros", autores: "Rocha et al., 2024", doi: "10.1103/PhysRevApplied.21.034055", resumo: "Análise dos mecanismos de decoerência em qubits transmon e implementação de protocolos de mitigação por sequências dinamicamente desacopladas, com caracterização por tomografia de processo quântico." },
+      perguntas: [
+        { pergunta: "Quais são os principais mecanismos de decoerência em qubits transmon?", opcoes: ["Apenas variações de temperatura","Flutuações de fluxo magnético, ruído de carga e acoplamento com fônons do substrato são os mecanismos dominantes","Interferência de campos externos apenas","Decoerência ocorre apenas acima de 100 mK"], correta: 1, explicacao: "Transmons são sensíveis a múltiplos canais de ruído — compreender cada contribuição é essencial para qubits mais coerentes." },
+        { pergunta: "Qual a limitação fundamental das sequências de desacoplamento dinâmico (DD)?", opcoes: ["DD não funciona em qubits supercondutores","DD mitiga ruído quasi-estático mas é ineficaz contra ruído de alta frequência e acumula erros de pulso","DD elimina toda a decoerência","DD só funciona a temperatura ambiente"], correta: 1, explicacao: "A eficácia de DD depende do espectro do ruído — ruído de alta frequência não é filtrado e pulsos imperfeitos acumulam erros." },
+        { pergunta: "Como a tomografia de processo quântico (QPT) se posiciona como ferramenta de caracterização?", opcoes: ["QPT é o método mais eficiente para sistemas grandes","QPT fornece caracterização completa mas escala exponencialmente com o número de qubits","QPT não fornece informação sobre erros de porta","QPT é equivalente à tomografia de estado"], correta: 1, explicacao: "O custo exponencial da QPT é limitação fundamental — randomized benchmarking existe para contornar esse problema em sistemas maiores." },
+        { pergunta: "Como este trabalho se insere no roadmap de computação quântica tolerante a falhas?", opcoes: ["Resolve completamente o problema de erros","Contribui para caracterização de mecanismos de erro que informam o design de códigos de correção quântica","É irrelevante para aplicações práticas","Apenas confirma resultados já estabelecidos"], correta: 1, explicacao: "Caracterizar erros fisicamente é prerequisito para escolher e otimizar códigos de correção — a hierarquia física→lógico→algoritmo define o roadmap." }
+      ]
+    }
+  },
+  engenharia: {
+    IC: {
+      artigo: { titulo: "Concreto com resíduos de borracha de pneu: propriedades mecânicas e durabilidade", autores: "Souza et al., 2022", doi: "10.1016/j.conbuildmat.2022.126891", resumo: "Avaliação das propriedades mecânicas e de durabilidade de concretos com substituição parcial de agregado fino por partículas de borracha reciclada de pneus inservíveis." },
+      perguntas: [
+        { pergunta: "Qual é o principal objetivo ambiental do estudo?", opcoes: ["Reduzir o consumo de cimento","Dar destinação sustentável a pneus inservíveis na construção civil","Eliminar o uso de areia","Produzir concreto mais pesado"], correta: 1, explicacao: "Pneus inservíveis são um passivo ambiental crítico — incorporá-los ao concreto oferece destinação útil." },
+        { pergunta: "Qual propriedade mecânica é tipicamente afetada pela borracha no concreto?", opcoes: ["Aumenta a resistência à compressão","Reduz a resistência à compressão mas melhora a tenacidade","Não altera nenhuma propriedade","Aumenta a densidade do compósito"], correta: 1, explicacao: "A interface borracha-matriz cimentícia é fraca, reduzindo resistência, mas a energia absorvida por deformação aumenta." },
+        { pergunta: "O que é substituído pela borracha nesta formulação?", opcoes: ["Cimento","Água de amassamento","Agregado fino (areia)","Aditivos químicos"], correta: 2, explicacao: "A borracha substitui parcialmente o agregado fino por ter granulometria similar à areia." },
+        { pergunta: "Por que estudar durabilidade além das propriedades mecânicas?", opcoes: ["Durabilidade é irrelevante na prática","Estruturas devem manter desempenho ao longo da vida útil, não apenas no estado inicial","Durabilidade é sempre superior com borracha","Apenas resistência à compressão importa em projeto"], correta: 1, explicacao: "Penetração de cloretos, carbonatação e retração determinam a vida útil real — tão importantes quanto resistência inicial." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Otimização topológica de estruturas metálicas para manufatura aditiva: restrições de processo e desempenho", autores: "Farias et al., 2023", doi: "10.1016/j.addma.2023.103621", resumo: "Metodologia de otimização topológica com restrições de fabricação por SLM para estruturas de Ti-6Al-4V, com validação experimental por ensaios mecânicos." },
+      perguntas: [
+        { pergunta: "Qual é o principal desafio de integrar otimização topológica com manufatura aditiva?", opcoes: ["Custo do software","As restrições de processo não são incorporadas naturalmente nos algoritmos clássicos de otimização","A manufatura aditiva não produz geometrias complexas","Ti-6Al-4V não é compatível com otimização topológica"], correta: 1, explicacao: "Otimização clássica gera geometrias que podem ser infabricáveis por SLM — incorporar restrições de processo é o gap central." },
+        { pergunta: "Por que Ti-6Al-4V é escolhido para manufatura aditiva estrutural?", opcoes: ["Por ser o mais barato","Por combinar alta razão resistência/peso com boa processabilidade por SLM e relevância em aeroespacial","Por ter maior condutividade térmica","Por ser o único material compatível com SLM"], correta: 1, explicacao: "Ti-6Al-4V domina aplicações estruturais em MA por sua biocompatibilidade, resistência específica e uso estabelecido." },
+        { pergunta: "Qual a contribuição da validação experimental?", opcoes: ["É opcional em estudos de otimização","Fecha o ciclo projeto-fabricação-teste, verificando se previsões computacionais se confirmam em peças reais","Apenas confirma que o SLM funciona","Substitui a necessidade de simulação futura"], correta: 1, explicacao: "A lacuna entre desempenho simulado e real em peças SLM (defeitos, anisotropia, tensões residuais) torna a validação indispensável." },
+        { pergunta: "Como o trabalho contribui para o Design for Additive Manufacturing (DfAM)?", opcoes: ["Demonstra que DfAM é equivalente ao design convencional","Fornece metodologia que conecta liberdade geométrica da MA com restrições reais de processo, avançando além de heurísticas","DfAM não se aplica a estruturas metálicas","Restrições de processo podem ser ignoradas"], correta: 1, explicacao: "DfAM maduro exige que restrições de processo sejam parte do problema de otimização desde o início." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Fadiga de alto ciclo em juntas soldadas por fricção e mistura (FSW) de alumínio aeroespacial", autores: "Nascimento et al., 2024", doi: "10.1016/j.ijfatigue.2024.108123", resumo: "Investigação dos mecanismos de iniciação e propagação de trinca por fadiga em juntas FSW de AA7075-T6, utilizando EBSD, tomografia computadorizada e mecânica da fratura com ênfase nos efeitos microestruturais da zona termomecanicamente afetada." },
+      perguntas: [
+        { pergunta: "Quais são as limitações de usar MFLE em fadiga de juntas FSW?", opcoes: ["MFLE é sempre adequada","A heterogeneidade microestrutural das zonas FSW viola as hipóteses de material homogêneo da MFLE, especialmente na iniciação","MFLE não existe para alumínio","Juntas FSW são sempre mais simples de modelar"], correta: 1, explicacao: "Gradientes locais de propriedades nas zonas FSW que a MFLE clássica não captura — modelos de campo de fase são alternativas." },
+        { pergunta: "Como a tomografia computadorizada avança o entendimento de fadiga em FSW?", opcoes: ["Apenas confirma resultados de EBSD","Permite caracterização 3D não-destrutiva da morfologia e crescimento de trinca, revelando caminhos preferenciais","Substitui completamente ensaios mecânicos","Só é aplicável após fratura completa"], correta: 1, explicacao: "A caracterização 3D por CT revela a tortosidade da trinca e interação com microestrutura em volume — inacessível por análise de superfície." },
+        { pergunta: "Qual a implicação prática para projetos aeroespaciais com FSW?", opcoes: ["FSW deve ser evitado em estruturas aeroespaciais","Os mecanismos de iniciação na TMAZ informam critérios de inspeção e limites de projeto mais realistas","FSW é sempre superior em fadiga","Os resultados não têm aplicação prática"], correta: 1, explicacao: "Entender onde as trincas iniciam permite definir inspeções direcionadas e ajustar margens de segurança em certificação aeroespacial." },
+        { pergunta: "Como posicionar este trabalho no estado da arte em fadiga de juntas soldadas?", opcoes: ["Como o primeiro trabalho sobre FSW e fadiga","Como contribuição que avança da caracterização fenomenológica para entendimento mecanístico com resolução microestrutural","Como confirmação de resultados já estabelecidos","Como trabalho apenas metodológico"], correta: 1, explicacao: "A maioria dos estudos de fadiga em FSW opera em nível fenomenológico — a conexão mecanística EBSD/CT/mecânica da fratura diferencia contribuições de alto impacto." }
+      ]
+    }
+  },
+  computacao: {
+    IC: {
+      artigo: { titulo: "Detecção de fake news usando aprendizado de máquina: comparação de algoritmos em português brasileiro", autores: "Gomes et al., 2022", doi: "10.1016/j.ipm.2022.102981", resumo: "Comparação de SVM, Random Forest, LSTM e BERT para classificação de notícias falsas em português, com análise de métricas de desempenho e interpretabilidade." },
+      perguntas: [
+        { pergunta: "O que é aprendizado de máquina supervisionado?", opcoes: ["Aprende sem dados rotulados","Aprende padrões a partir de exemplos rotulados para fazer previsões","Requer intervenção humana em cada previsão","Funciona apenas com imagens"], correta: 1, explicacao: "No aprendizado supervisionado, o modelo aprende a partir de pares entrada-saída rotulados, minimizando o erro de previsão." },
+        { pergunta: "Por que BERT tem vantagem sobre SVM para classificação de texto?", opcoes: ["BERT é mais simples","BERT captura contexto bidirecional e representações semânticas ricas via pré-treinamento em grandes corpora","BERT requer menos dados","SVM não funciona para texto"], correta: 1, explicacao: "BERT usa atenção bidirecional para capturar dependências de longo alcance, superando limitações de modelos bag-of-words." },
+        { pergunta: "Qual métrica é mais adequada para classes desbalanceadas?", opcoes: ["Apenas acurácia","F1-score, que combina precisão e recall equilibrando falsos positivos e negativos","Apenas tempo de execução","Número de parâmetros do modelo"], correta: 1, explicacao: "Com classes desbalanceadas, a acurácia é enganosa — F1-score captura melhor o desempenho real em ambas as classes." },
+        { pergunta: "Por que estudar fake news em português especificamente?", opcoes: ["Português é mais fácil de processar","Modelos treinados em inglês não transferem bem por diferenças linguísticas e contextuais","Não há fake news em inglês","Todos os datasets são em português"], correta: 1, explicacao: "Transferência entre idiomas é limitada — modelos precisam de dados e fine-tuning em português para capturar nuances específicas." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Federated Learning com privacidade diferencial para dados médicos: trade-off entre privacidade e utilidade", autores: "Teixeira et al., 2023", doi: "10.1016/j.future.2023.07.018", resumo: "Implementação de DP-FL para treinamento de modelos de diagnóstico sem compartilhamento de dados sensíveis, analisando o trade-off entre garantias de privacidade e performance dos modelos." },
+      perguntas: [
+        { pergunta: "O que é Federated Learning e por que é relevante para dados médicos?", opcoes: ["Centraliza todos os dados em um servidor","Treina modelos localmente em cada instituição e agrega apenas gradientes, preservando dados sensíveis no local","Elimina a necessidade de treinamento","Funciona apenas para imagens médicas"], correta: 1, explicacao: "FL é valioso em saúde por regulamentações (LGPD, HIPAA) que impedem centralização de dados de pacientes." },
+        { pergunta: "Qual é o principal trade-off ao adicionar privacidade diferencial ao FL?", opcoes: ["Não há trade-off","Maior garantia de privacidade requer mais ruído, degradando a performance do modelo","Privacidade diferencial sempre melhora a performance","O trade-off afeta apenas o tempo de treinamento"], correta: 1, explicacao: "O ruído necessário para garantias formais de privacidade inevitavelmente degrada a acurácia do modelo." },
+        { pergunta: "Qual gap este trabalho aborda?", opcoes: ["FL e DP já foram completamente estudados em conjunto","Falta de análise sistemática do trade-off em configurações clínicas reais com heterogeneidade de dados entre instituições","Ausência de interesse em privacidade de dados médicos","FL ainda não é aplicável a dados médicos"], correta: 1, explicacao: "A heterogeneidade dos dados entre hospitais (non-IID) agrava o trade-off de formas que estudos em dados homogêneos não capturam." },
+        { pergunta: "Como este trabalho contribui para regulamentação e adoção clínica de IA?", opcoes: ["Não tem implicações regulatórias","Fornece análise quantitativa do trade-off que pode informar escolhas de epsilon em conformidade com regulamentações","Demonstra que privacidade é incompatível com IA médica","Os resultados são específicos demais"], correta: 1, explicacao: "Reguladores precisam de evidências sobre quão úteis modelos com garantias formais de privacidade podem ser." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Complexidade de circuitos quânticos e limites de vantagem quântica: implicações para algoritmos NISQ", autores: "Barbosa et al., 2024", doi: "10.1145/3618260.3649740", resumo: "Análise de separações oraculares entre classes de complexidade quântica e clássica, com implicações para a existência de vantagem quântica em algoritmos NISQ de profundidade limitada e ruído realístico." },
+      perguntas: [
+        { pergunta: "O que limita a afirmação de vantagem quântica em dispositivos NISQ?", opcoes: ["NISQ provou vantagem em todos os casos relevantes","Profundidade limitada, ruído acumulativo e ausência de correção de erro impedem algoritmos assintoticamente vantajosos","NISQ é equivalente a computadores clássicos","Vantagem quântica só é possível com correção de erro perfeita"], correta: 1, explicacao: "O regime NISQ opera abaixo do threshold de correção de erro — o ruído destrói a coerência antes que vantagens se manifestem." },
+        { pergunta: "O que uma separação oracular demonstra e qual sua limitação?", opcoes: ["Prova vantagem quântica em todos os problemas práticos","Demonstra separação em problemas com oráculo (caixa-preta), mas não implica separação para problemas concretos sem oráculo","É equivalente a prova incondicional de separação de complexidade","Separações oraculares são irrelevantes"], correta: 1, explicacao: "Separações oraculares não provam P≠BQP — podem existir algoritmos clássicos equivalentes para versões sem oráculo." },
+        { pergunta: "Como o trabalho se posiciona no debate sobre utilidade prática de computadores quânticos?", opcoes: ["Confirma que qualquer VQA tem vantagem quântica","Fornece análise rigorosa das condições necessárias para vantagem em profundidade limitada, contribuindo para expectativas calibradas","Demonstra que computação quântica é inviável","Os resultados não têm relevância prática"], correta: 1, explicacao: "Calibrar expectativas com rigor teórico é contribuição de alto valor — o hype em computação quântica frequentemente ignora limitações fundamentais." },
+        { pergunta: "Qual a implicação para algoritmos variacionais (VQAs) como QAOA e VQE?", opcoes: ["VQAs têm vantagem quântica garantida","Os limites de profundidade sugerem que VQAs rasos provavelmente não escapam de mínimos locais que algoritmos clássicos também encontram","VQAs são solução definitiva para otimização","A análise de complexidade não se aplica a VQAs"], correta: 1, explicacao: "A conexão entre profundidade, expressividade e paisagem de otimização de VQAs é um dos problemas mais abertos no campo." }
+      ]
+    }
+  },
+  medicina: {
+    IC: {
+      artigo: { titulo: "Prevalência de resistência antimicrobiana em Staphylococcus aureus isolados de UTIs brasileiras", autores: "Cardoso et al., 2022", doi: "10.1016/j.bjid.2022.102340", resumo: "Levantamento da prevalência de MRSA e perfil de resistência em isolados de UTIs de hospitais terciários brasileiros, com análise de fatores de risco associados a infecções por cepas multirresistentes." },
+      perguntas: [
+        { pergunta: "O que é MRSA?", opcoes: ["Uma vitamina usada em hospitais","Staphylococcus aureus resistente à meticilina, bactéria de grande preocupação em infecções hospitalares","Um antifúngico de amplo espectro","Uma técnica de diagnóstico por imagem"], correta: 1, explicacao: "MRSA é uma cepa de S. aureus resistente à meticilina (e à maioria dos beta-lactâmicos), causando infecções hospitalares graves." },
+        { pergunta: "Por que UTIs são o foco do estudo?", opcoes: ["Por conveniência amostral","Por concentrarem pacientes imunocomprometidos e uso intensivo de antibióticos, favorecendo seleção de resistência","Por terem melhores registros","Por serem os únicos locais com S. aureus"], correta: 1, explicacao: "UTIs combinam pressão de seleção antibiótica intensa, pacientes vulneráveis e procedimentos invasivos — ambiente ideal para resistência." },
+        { pergunta: "Qual é a principal preocupação clínica com cepas multirresistentes?", opcoes: ["São mais fáceis de diagnosticar","Reduzem as opções terapêuticas disponíveis, aumentando mortalidade","Causam apenas infecções leves","São mais facilmente eliminadas pelo sistema imune"], correta: 1, explicacao: "A multirresistência estreita o arsenal terapêutico, forçando uso de antibióticos de última linha com mais efeitos adversos." },
+        { pergunta: "Qual a relevância de estudar fatores de risco para MRSA?", opcoes: ["Não tem relevância clínica","Permite identificar pacientes de alto risco para implementar precauções antes do diagnóstico formal","Fatores de risco são os mesmos em todo o mundo","Apenas para fins acadêmicos"], correta: 1, explicacao: "O diagnóstico microbiológico leva dias — identificar fatores de risco permite terapia empírica adequada mais precoce." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Biomarcadores de neuroimagem como preditores de progressão de MCI para doença de Alzheimer", autores: "Moreira et al., 2023", doi: "10.1016/j.jalz.2023.04.012", resumo: "Estudo longitudinal avaliando PET amiloide, tau e FDG-PET como preditores de conversão de comprometimento cognitivo leve para Alzheimer, com análise de curvas ROC e modelos combinados." },
+      perguntas: [
+        { pergunta: "Por que identificar preditores de conversão MCI→Alzheimer é clinicamente relevante?", opcoes: ["MCI sempre evolui para Alzheimer","Permite selecionar pacientes para intervenções preventivas antes da demência estabelecida","MCI e Alzheimer são a mesma condição","Apenas para planejamento de pesquisas"], correta: 1, explicacao: "Identificar quem vai converter permite enrolar o paciente em ensaios preventivos — quando a intervenção pode ser mais eficaz." },
+        { pergunta: "Qual é a vantagem de combinar múltiplos biomarcadores de PET?", opcoes: ["Reduz o custo","Cada biomarcador captura aspectos diferentes da patologia, e modelos combinados têm maior poder preditivo","Combinar sempre piora a especificidade","Os biomarcadores são redundantes"], correta: 1, explicacao: "Amiloide precede tau que precede neurodegeneração (FDG) — a combinação captura a progressão mais completamente." },
+        { pergunta: "Qual gap este trabalho preenche em relação a estudos transversais?", opcoes: ["Estudos transversais já fornecem toda informação","O delineamento longitudinal permite estabelecer a sequência temporal e predizer conversão, o que dados transversais não permitem","Longitudinais são inferiores a transversais","Não há diferença entre delineamentos"], correta: 1, explicacao: "Causalidade e predição exigem temporalidade — só seguindo pacientes é possível saber quais biomarcadores predizem a conversão." },
+        { pergunta: "Como a análise ROC contribui para a tradução clínica?", opcoes: ["Apenas confirma que o teste funciona","Permite definir pontos de corte que equilibram sensibilidade e especificidade para uso clínico real","ROC é apenas estatística sem aplicação clínica","ROC é inferior ao odds ratio para este fim"], correta: 1, explicacao: "A AUC e o ponto de corte por ROC conectam o biomarcador a uma decisão clínica prática — triagem ou tratamento preventivo." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Imunoterapia com células CAR-T em linfomas difusos de grandes células B: mecanismos de resistência", autores: "Azevedo et al., 2024", doi: "10.1038/s41375-024-02189-8", resumo: "Revisão integrativa dos mecanismos moleculares de resistência à terapia CAR-T em DLBCL, com avaliação de estratégias emergentes incluindo CAR-T de próxima geração e combinações com inibidores de checkpoint." },
+      perguntas: [
+        { pergunta: "Quais são os principais mecanismos de resistência à CAR-T em DLBCL?", opcoes: ["A resistência à CAR-T não existe clinicamente","Perda do antígeno-alvo, disfunção e exaustão das células CAR-T, e supressão pelo microambiente tumoral são os mecanismos centrais","Apenas a rejeição imunológica causa falha","A resistência é sempre reversível com doses maiores"], correta: 1, explicacao: "A resistência à CAR-T é multifatorial — antígeno escape, exaustão e microambiente imunossupressor frequentemente coexistem." },
+        { pergunta: "Como CAR-T de próxima geração abordam a exaustão celular?", opcoes: ["Aumentando simplesmente a dose","Incorporando domínios coestimuladores adicionais, modificações epigenéticas e armamento com citocinas para manter o fenótipo efetor","A exaustão não pode ser mitigada por design do construto","Apenas seleção de pacientes pode superar a exaustão"], correta: 1, explicacao: "A engenharia evoluiu para incluir switches de checkpoint, IL-15/IL-21 e edição epigenética para maior durabilidade." },
+        { pergunta: "Quais são as limitações de combinar CAR-T com inibidores de checkpoint?", opcoes: ["ICIs sempre melhoram a função CAR-T sem riscos","Potencial sinergia é acompanhada de risco de toxicidade imunomediada e o momento ideal permanece indefinido","ICIs não interagem com células CAR-T","A combinação é padrão de cuidado estabelecido"], correta: 1, explicacao: "O balanço risco-benefício e a sequência ótima de administração são questões abertas que ensaios prospectivos precisam responder." },
+        { pergunta: "Como este trabalho contribui além de sumarizar literatura?", opcoes: ["É apenas uma revisão sem contribuição original","A análise integrativa propõe um framework para seleção racional de estratégias baseado no padrão de falha individual","Revisões sistemáticas nunca têm contribuição original","Apenas confirma que CAR-T funciona em DLBCL"], correta: 1, explicacao: "Revisões que propõem frameworks para guiar decisões clínicas têm impacto que vai além da sumarização — diferencial de uma revisão de alto impacto." }
+      ]
+    }
+  },
+  agronomia: {
+    IC: {
+      artigo: { titulo: "Efeito de doses de nitrogênio na produtividade e qualidade de grãos de trigo no Paraná", autores: "Peres et al., 2021", doi: "10.1590/0034-737X202168040006", resumo: "Avaliação de doses crescentes de N em cobertura (0–120 kg N/ha) sobre produtividade, teor de proteína e qualidade industrial dos grãos de trigo em dois municípios paranaenses." },
+      perguntas: [
+        { pergunta: "Por que o nitrogênio é o nutriente mais estudado em trigo?", opcoes: ["Por ser o mais caro","Por ser componente essencial de proteínas e clorofila, diretamente relacionado à produtividade e qualidade do grão","Por ser o único nutriente limitante","Por ser o mais abundante no solo"], correta: 1, explicacao: "N é constituinte de aminoácidos (glúten) e clorofila — afeta produtividade fotossintética e qualidade proteica do trigo." },
+        { pergunta: "O que é adubação de cobertura?", opcoes: ["Aplicação de fertilizante antes do plantio","Aplicação de fertilizante após a emergência da cultura, durante o crescimento","Aplicação de calcário para correção do pH","Uso de adubo verde como pré-cultura"], correta: 1, explicacao: "Adubação de cobertura fornece nutrientes durante o crescimento ativo, sincronizando o aporte com a demanda da cultura." },
+        { pergunta: "Por que o estudo foi realizado em dois municípios?", opcoes: ["Por exigência do periódico","Para avaliar a resposta em diferentes condições de solo e clima, aumentando a validade das recomendações","Para duplicar publicações","Por conveniência logística"], correta: 1, explicacao: "A resposta à adubação nitrogenada varia com solo e clima — resultados de um único local têm validade regional limitada." },
+        { pergunta: "Qual parâmetro de qualidade industrial foi mais relevante?", opcoes: ["Cor dos grãos","Teor de proteína, que determina a força do glúten e aptidão para panificação","Tamanho dos grãos","Umidade na colheita"], correta: 1, explicacao: "Teor de proteína determina a força do glúten, absorção de água e aptidão para pão, macarrão ou biscoito." }
+      ]
+    },
+    Mestrado: {
+      artigo: { titulo: "Coinoculação de Bradyrhizobium e Azospirillum brasilense na fixação biológica de nitrogênio em soja no Cerrado", autores: "Andrade et al., 2023", doi: "10.1590/1981-1624-2023-v28-e20220074", resumo: "Avaliação da coinoculação de B. japonicum com A. brasilense na FBN, nodulação e produtividade de soja no Cerrado, com e sem nitrogênio mineral em cobertura." },
+      perguntas: [
+        { pergunta: "Como Azospirillum complementa Bradyrhizobium na coinoculação?", opcoes: ["Azospirillum também fixa nitrogênio nos nódulos","Azospirillum produz fitohormônios que promovem crescimento radicular, aumentando a superfície de infecção por Bradyrhizobium","Azospirillum compete pelos mesmos sítios de infecção","Azospirillum fornece carbono para Bradyrhizobium"], correta: 1, explicacao: "O principal mecanismo do Azospirillum é a produção de AIA e fitohormônios que aumentam biomassa radicular, potencializando a colonização por Bradyrhizobium." },
+        { pergunta: "Por que estudar a interação entre FBN e adubação nitrogenada mineral?", opcoes: ["N mineral sempre melhora a FBN","N mineral em doses elevadas pode inibir a nodulação — entender esse limiar é essencial para evitar custo e perda de FBN","FBN e N mineral são independentes e aditivos","N mineral sempre substitui a necessidade de inoculação"], correta: 1, explicacao: "Doses elevadas de N inibem a nodulação por supressão do sinal de flavonoides — a interação define a estratégia de manejo mais eficiente." },
+        { pergunta: "Qual gap este trabalho preenche?", opcoes: ["Nada é conhecido sobre FBN em soja","A resposta da coinoculação varia com cultivar e edafoclima do Cerrado — dados locais são necessários para recomendações calibradas","A coinoculação é ineficaz no Cerrado","Bradyrhizobium já fornece todos os benefícios"], correta: 1, explicacao: "A variabilidade entre ambientes e cultivares exige dados regionais específicos para recomendações agronômicas confiáveis." },
+        { pergunta: "Quais são as implicações econômicas e ambientais dos resultados?", opcoes: ["Sem implicações econômicas","A coinoculação eficaz pode reduzir N mineral, diminuindo custo e emissões de N₂O","A coinoculação aumenta necessariamente o uso de agroquímicos","Resultados se aplicam apenas a condições experimentais"], correta: 1, explicacao: "O Brasil é o maior produtor de soja — qualquer ganho em FBN tem impacto econômico e ambiental de escala, especialmente na redução de N₂O (potente GEE)." }
+      ]
+    },
+    Doutorado: {
+      artigo: { titulo: "Adaptação de cana-de-açúcar a déficit hídrico: respostas fisiológicas, bioquímicas e transcriptômicas", autores: "Monteiro et al., 2024", doi: "10.1111/pce.14856", resumo: "Caracterização integrada de respostas de cultivares contrastantes de cana sob déficit hídrico progressivo, identificando genes candidatos para tolerância via RNA-seq, osmólitos e enzimas antioxidantes." },
+      perguntas: [
+        { pergunta: "Quais são as limitações de usar respostas fisiológicas isoladamente para caracterizar tolerância à seca?", opcoes: ["Fisiologia fornece informação completa","Respostas fisiológicas são integrativas e tardias — não discriminam mecanismos moleculares nem identificam alvos para melhoramento","A fisiologia não muda sob déficit hídrico","Medidas fisiológicas são sempre mais precisas que moleculares"], correta: 1, explicacao: "Integrar fisiologia com transcriptômica é o salto que este trabalho propõe — a fisiologia descreve o fenômeno, a transcriptômica aponta os genes responsáveis." },
+        { pergunta: "Como o RNA-seq avança o entendimento além do RT-qPCR?", opcoes: ["RNA-seq confirma apenas o que RT-qPCR detecta","RNA-seq fornece visão transcriptômica global sem hipótese prévia, revelando vias e genes não anteriormente associados à resposta à seca","RNA-seq é menos sensível","RT-qPCR é sempre preferível por ser mais barato"], correta: 1, explicacao: "Abordagens sem hipótese prévia são essenciais para identificar novos mecanismos — a cana tem genoma complexo com biologia ainda pouco explorada." },
+        { pergunta: "Qual é o desafio de identificar genes candidatos a partir de dados transcriptômicos?", opcoes: ["Genes expressos diferencialmente são sempre causais","A correlação entre expressão diferencial e tolerância não implica causalidade — validação funcional por CRISPR ou transformação é necessária","Dados de RNA-seq são suficientes para recomendar cultivares","O número de candidatos é sempre pequeno"], correta: 1, explicacao: "Listas de genes diferencialmente expressos precisam de filtros biológicos e validação funcional para ter utilidade no melhoramento." },
+        { pergunta: "Como posicionar este trabalho no contexto do melhoramento de cana para seca?", opcoes: ["Como solução completa para o problema","Como contribuição que avança da caracterização fenotípica para marcadores candidatos, mas requer validação e ensaios multi-ambiente","Como trabalho apenas acadêmico","Os resultados só se aplicam às cultivares estudadas"], correta: 1, explicacao: "A cadeia descoberta→validação→introgresso em cultivares elite é longa, mas identificar candidatos robustos é matéria-prima essencial para melhoramento molecular." }
+      ]
+    }
+  }
+};
+
+let nivelAtual = 'IC';
+let estado = { nivel: 'IC', area: 'materiais', dados: null, qAtual: 0, acertos: 0 };
+
+function selecionarNivel(nivel, el) {
+  nivelAtual = nivel;
+  document.querySelectorAll('.nivel-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function iniciar() {
+  estado.nivel = nivelAtual;
+  estado.area = document.getElementById('area').value;
+  const dados = DB[estado.area] && DB[estado.area][estado.nivel];
+  if (!dados) {
+    document.getElementById('err-setup').textContent = 'Combinação ainda não disponível neste protótipo.';
+    return;
+  }
+  document.getElementById('err-setup').textContent = '';
+  estado.dados = dados;
+  const a = dados.artigo;
+  const areaLabel = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
+  document.getElementById('art-area').textContent = areaLabel + ' · ' + estado.nivel;
+  document.getElementById('art-titulo').textContent = a.titulo;
+  document.getElementById('art-meta').textContent = a.autores + ' — ' + a.resumo;
+  const doi = document.getElementById('art-doi');
+  doi.textContent = 'DOI: ' + a.doi;
+  doi.href = 'https://doi.org/' + a.doi;
+  show('s-artigo');
+}
+
+function irPerguntas() {
+  estado.qAtual = 0;
+  estado.acertos = 0;
+  showQ();
+  show('s-perguntas');
+}
+
+function showQ() {
+  const q = estado.dados.perguntas[estado.qAtual];
+  const total = estado.dados.perguntas.length;
+  document.getElementById('prog').style.width = (estado.qAtual / total * 100) + '%';
+  document.getElementById('q-num').textContent = 'Pergunta ' + (estado.qAtual + 1) + ' de ' + total;
+  document.getElementById('q-nivel').textContent = estado.nivel;
+  document.getElementById('q-text').textContent = q.pergunta;
+  document.getElementById('expl-box').innerHTML = '';
+  document.getElementById('btn-prox').style.display = 'none';
+  const opts = document.getElementById('opts');
+  opts.innerHTML = '';
+  q.opcoes.forEach(function(op, i) {
+    const b = document.createElement('button');
+    b.className = 'option';
+    b.textContent = op;
+    b.onclick = function() { responder(i, b); };
+    opts.appendChild(b);
+  });
+}
+
+function responder(idx, btn) {
+  const q = estado.dados.perguntas[estado.qAtual];
+  document.querySelectorAll('.option').forEach(function(b) { b.onclick = null; });
+  if (idx === q.correta) { btn.classList.add('correct'); estado.acertos++; }
+  else { btn.classList.add('wrong'); document.querySelectorAll('.option')[q.correta].classList.add('correct'); }
+  const expl = document.createElement('div');
+  expl.className = 'expl';
+  expl.textContent = q.explicacao;
+  document.getElementById('expl-box').appendChild(expl);
+  document.getElementById('btn-prox').style.display = 'block';
+}
+
+function proxima() {
+  estado.qAtual++;
+  if (estado.qAtual < estado.dados.perguntas.length) { showQ(); }
+  else { mostrarResultado(); }
+}
+
+function mostrarResultado() {
+  const ac = estado.acertos;
+  const tot = estado.dados.perguntas.length;
+  const pct = ac / tot;
+  document.getElementById('res-icon').textContent = pct === 1 ? '🏆' : pct >= 0.5 ? '🎯' : '📚';
+  document.getElementById('res-score').textContent = ac + '/' + tot;
+  const f = pct === 1
+    ? 'Sessão perfeita! Você demonstrou excelente compreensão do artigo. Amanhã exploraremos um tema complementar para aprofundar ainda mais.'
+    : pct >= 0.5
+    ? 'Bom desempenho! Você captou os pontos principais. Revise as questões erradas e avance — a consistência é o que constrói a expertise científica.'
+    : 'É o começo da jornada! Leitura de artigos científicos é uma habilidade que se treina com prática diária. Releia as seções de metodologia e resultados.';
+  document.getElementById('res-feedback').textContent = f;
+  show('s-resultado');
+}
+
+function voltarSetup() { show('s-setup'); }
+</script>
+</body>
+</html>
