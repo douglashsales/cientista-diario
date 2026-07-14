@@ -546,7 +546,7 @@ async function chamarIA(prompt) {
       'HTTP-Referer': window.location.href
     },
     body: JSON.stringify({
-      model: 'google/gemma-3-27b-it:free',
+      model: 'openrouter/auto',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1200
     })
