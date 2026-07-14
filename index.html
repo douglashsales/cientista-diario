@@ -546,15 +546,26 @@ function iniciar() {
   doi.textContent = 'DOI →';
   doi.href = 'https://doi.org/' + a.doi;
 
-  const scholarQuery = encodeURIComponent(a.titulo);
   const scholarLink = document.getElementById('art-scholar');
-  scholarLink.href = 'https://scholar.google.com/scholar?q=' + scholarQuery;
-
   const projetoLabel = document.getElementById('art-projeto-label');
+
   if (estado.projeto) {
+    // Usa a descrição do projeto como query para o Google Acadêmico
+    const stopwords = ['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','uns','umas','o','a','os','as','e','é','ao','à','se','seu','sua','seus','suas','este','esta','estes','estas','esse','essa','sobre','sob','entre','como','mais','mas','quando','onde','quem','qual','quais','meu','minha','foi','ser'];
+    const palavras = estado.projeto
+      .toLowerCase()
+      .replace(/[^\w\sáàãâéêíóôõúüç]/g, ' ')
+      .split(/\s+/)
+      .filter(p => p.length > 2 && !stopwords.includes(p));
+    const query = [...new Set(palavras)].slice(0, 6).join(' ');
+    scholarLink.href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(query) + '&hl=pt-BR';
     projetoLabel.style.display = 'block';
-    projetoLabel.textContent = '📌 Selecionado com base no seu projeto: "' + estado.projeto.substring(0, 60) + (estado.projeto.length > 60 ? '…' : '') + '"';
+    projetoLabel.textContent = '🔍 Busca: "' + query + '"';
   } else {
+    // Sem descrição, usa área + nível como fallback
+    const areaLabel = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
+    const fallbackQuery = areaLabel + ' ' + estado.nivel;
+    scholarLink.href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(fallbackQuery) + '&hl=pt-BR';
     projetoLabel.style.display = 'none';
   }
 
