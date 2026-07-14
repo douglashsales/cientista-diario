@@ -163,6 +163,37 @@
 
     .footer { text-align: center; font-size: 11px; color: #ccc; padding: 16px 0 8px; }
     .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; }
+
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+    .option.correct { animation: bounce 0.3s ease; }
+    .option.wrong { animation: shake 0.3s ease; }
+
+    .studied-banner { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .studied-banner .sb-icon { font-size: 28px; }
+    .studied-banner .sb-text { font-size: 14px; font-weight: 600; color: #15803d; }
+    .studied-banner .sb-sub { font-size: 12px; color: #16a34a; margin-top: 2px; }
+
+    .session-card.done { background: #e8e8e4; cursor: default; }
+    .session-card.done .sc-btn { background: #ccc; color: #888; }
+
+    #s-erro { background: #fff; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+    .erro-icon { font-size: 56px; margin-bottom: 16px; }
+    .erro-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .erro-desc { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 24px; }
+
+    #s-perfil { background: #f5f5f0; }
+    .perfil-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; display: flex; align-items: center; gap: 14px; }
+    .perfil-avatar { width: 52px; height: 52px; background: #4f6ef7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .perfil-info h2 { font-size: 20px; font-weight: 800; color: #fff; }
+    .perfil-info p { font-size: 13px; color: #888; margin-top: 2px; }
+    .perfil-body { padding: 1.25rem; }
+    .perfil-card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 12px; }
+    .perfil-card h3 { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .perfil-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f0; }
+    .perfil-row:last-child { border-bottom: none; }
+    .perfil-row .pr-label { font-size: 14px; color: #888; }
+    .perfil-row .pr-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
   </style>
 </head>
 <body>
@@ -263,11 +294,20 @@
     </div>
     <div class="home-body">
 
+      <!-- Banner já estudou hoje -->
+      <div class="studied-banner" id="studied-banner" style="display:none;">
+        <div class="sb-icon">✅</div>
+        <div>
+          <div class="sb-text">Sessão de hoje concluída!</div>
+          <div class="sb-sub" id="studied-sub">Volte amanhã para manter seu streak.</div>
+        </div>
+      </div>
+
       <!-- Botão iniciar sessão -->
-      <div class="session-card" onclick="iniciarSessao()">
+      <div class="session-card" id="session-card" onclick="iniciarSessao()">
         <h3>Sessão de hoje</h3>
         <p id="home-sessao-desc">A IA vai sugerir um artigo baseado no seu projeto e gerar perguntas personalizadas.</p>
-        <div class="sc-btn">Iniciar agora →</div>
+        <div class="sc-btn" id="session-btn">Iniciar agora →</div>
       </div>
 
       <!-- Stats -->
@@ -312,17 +352,53 @@
 
       <!-- Config -->
       <div class="home-section">Configurações</div>
-      <div class="config-card" onclick="irEditarPerfil()">
+      <div class="config-card" onclick="irPerfil()">
         <div class="config-row">
           <div>
             <div class="config-label" id="cfg-nivel">IC</div>
             <div style="font-size:11px;color:#aaa;" id="cfg-area">Ciência dos Materiais</div>
           </div>
-          <div class="config-edit">Editar →</div>
+          <div class="config-edit">Ver perfil →</div>
         </div>
       </div>
 
       <div class="footer">CientistaDiário · v0.2</div>
+    </div>
+  </div>
+
+  <!-- ERRO -->
+  <div class="screen" id="s-erro">
+    <div class="erro-icon" id="erro-icon">😕</div>
+    <div class="erro-title" id="erro-title">Algo deu errado</div>
+    <div class="erro-desc" id="erro-desc">Não foi possível conectar com a IA. Verifique sua internet e tente novamente.</div>
+    <button class="btn btn-dark" id="erro-btn" onclick="erroTentar()">Tentar novamente →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="show('s-home')">Voltar ao início</button>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="screen" id="s-perfil">
+    <div class="perfil-header">
+      <div class="perfil-avatar" id="perf-avatar">?</div>
+      <div class="perfil-info">
+        <h2 id="perf-nome">—</h2>
+        <p id="perf-nivel-area">—</p>
+      </div>
+    </div>
+    <div class="perfil-body">
+      <div class="perfil-card">
+        <h3>Estatísticas</h3>
+        <div class="perfil-row"><span class="pr-label">Sessões completadas</span><span class="pr-value" id="perf-sessoes">0</span></div>
+        <div class="perfil-row"><span class="pr-label">Respostas certas</span><span class="pr-value" id="perf-acertos">0</span></div>
+        <div class="perfil-row"><span class="pr-label">Aproveitamento</span><span class="pr-value" id="perf-pct">0%</span></div>
+        <div class="perfil-row"><span class="pr-label">Maior sequência</span><span class="pr-value" id="perf-maior">0 dias</span></div>
+        <div class="perfil-row"><span class="pr-label">Badges conquistados</span><span class="pr-value" id="perf-badges">0</span></div>
+      </div>
+      <div class="perfil-card">
+        <h3>Projeto de pesquisa</h3>
+        <div style="font-size:14px;color:#555;line-height:1.6;" id="perf-projeto">—</div>
+      </div>
+      <button class="btn btn-dark" onclick="irEditarPerfil()">Editar perfil →</button>
+      <button class="btn btn-ghost" onclick="show('s-home')">Voltar</button>
     </div>
   </div>
 
@@ -470,6 +546,24 @@ function renderHome() {
     el.innerHTML='<div class="bi">'+b.icon+'</div><div><div class="bt">'+b.title+'</div><div class="bd">'+b.desc+'</div></div>';
     bg.appendChild(el);
   }
+
+  // Banner já estudou hoje
+  const jaEstudou=p.dias.includes(hoje());
+  const banner=document.getElementById('studied-banner');
+  const card=document.getElementById('session-card');
+  const btn=document.getElementById('session-btn');
+  if(jaEstudou){
+    banner.style.display='flex';
+    document.getElementById('studied-sub').textContent='Streak atual: '+p.streakAtual+'🔥 — volte amanhã!';
+    card.classList.add('done');
+    card.onclick=null;
+    btn.textContent='Concluído hoje ✓';
+  } else {
+    banner.style.display='none';
+    card.classList.remove('done');
+    card.onclick=iniciarSessao;
+    btn.textContent='Iniciar agora →';
+  }
 }
 
 // ── ONBOARDING ────────────────────────────────────────────
@@ -571,7 +665,7 @@ async function iniciarSessao() {
     const aq=document.getElementById('art-query');
     aq.style.display='block'; aq.textContent='🔍 Busca: "'+query+'"';
     show('s-artigo');
-  } catch(e) { show('s-home'); alert('Erro ao buscar artigo. Tente novamente.'); }
+  } catch(e) { mostrarErro('Erro ao buscar artigo', 'Não foi possível conectar com a IA. Verifique sua internet e tente novamente.', iniciarSessao); }
 }
 
 async function irPerguntas() {
@@ -587,7 +681,7 @@ async function irPerguntas() {
     if(!Array.isArray(parsed)||parsed.length===0) throw new Error('JSON inválido');
     estado.perguntas=parsed; estado.qAtual=0; estado.acertos=0;
     showQ(); show('s-perguntas');
-  } catch(e) { show('s-artigo'); alert('Erro ao gerar perguntas. Tente novamente.'); }
+  } catch(e) { mostrarErro('Erro ao gerar perguntas', 'A IA não conseguiu gerar as perguntas. Tente novamente ou volte ao artigo.', irPerguntas); }
 }
 
 function showQ() {
@@ -652,6 +746,34 @@ async function mostrarResultado() {
 }
 
 function voltarHome() { renderHome(); show('s-home'); }
+
+// ── ERRO ──────────────────────────────────────────────────
+let erroCallback=null;
+function mostrarErro(titulo, desc, callback) {
+  document.getElementById('erro-title').textContent=titulo;
+  document.getElementById('erro-desc').textContent=desc;
+  erroCallback=callback;
+  show('s-erro');
+}
+function erroTentar() { if(erroCallback) erroCallback(); }
+
+// ── PERFIL ────────────────────────────────────────────────
+function irPerfil() {
+  const perf=loadPerfil()||{};
+  const p=loadProgress();
+  const inicial=(perf.nome||'?')[0].toUpperCase();
+  document.getElementById('perf-avatar').textContent=inicial;
+  document.getElementById('perf-nome').textContent=perf.nome||'Pesquisador';
+  document.getElementById('perf-nivel-area').textContent=(perf.nivel||'IC')+' · '+(perf.areaNome||'');
+  document.getElementById('perf-sessoes').textContent=p.sessoes;
+  document.getElementById('perf-acertos').textContent=p.totalAcertos;
+  const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
+  document.getElementById('perf-pct').textContent=pct+'%';
+  document.getElementById('perf-maior').textContent=p.maiorStreak+' dias';
+  document.getElementById('perf-badges').textContent=p.badges.length+'/'+BADGES_DEF.length;
+  document.getElementById('perf-projeto').textContent=perf.projeto||'Nenhum projeto descrito.';
+  show('s-perfil');
+}
 
 // ── INICIALIZAÇÃO ─────────────────────────────────────────
 function init() {
