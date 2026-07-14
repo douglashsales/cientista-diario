@@ -2,190 +2,361 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>CientistaDiário</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
-    .app { max-width: 420px; margin: 0 auto; padding: 1rem; min-height: 100vh; background: #fff; }
-    .screen { display: none; }
-    .screen.active { display: block; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+    .app { max-width: 420px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; overflow: hidden; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes pop { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slideIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
 
-    .logo { text-align: center; padding: 2rem 0 1.5rem; }
-    .logo .atom { font-size: 44px; margin-bottom: 8px; }
-    .logo h1 { font-size: 26px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
-    .logo p { font-size: 14px; color: #888; margin-top: 4px; }
+    /* ── SPLASH ── */
+    #s-splash { background: #1a1a1a; align-items: center; justify-content: center; }
+    .splash-logo { text-align: center; animation: pop 0.5s ease; }
+    .splash-logo .atom { font-size: 72px; margin-bottom: 16px; }
+    .splash-logo h1 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+    .splash-logo p { font-size: 15px; color: #888; margin-top: 6px; }
+    .splash-bar { width: 60px; height: 3px; background: #4f6ef7; border-radius: 2px; margin: 32px auto 0; animation: splashbar 2s ease forwards; }
+    @keyframes splashbar { from{width:0} to{width:200px} }
 
-    .card { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 12px; }
-    .lbl { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    /* ── ONBOARDING ── */
+    #s-onboarding { background: #fff; }
+    .ob-wrap { flex: 1; display: flex; flex-direction: column; }
+    .ob-slides { flex: 1; position: relative; overflow: hidden; }
+    .ob-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; opacity: 0; transform: translateX(100%); transition: all 0.4s ease; }
+    .ob-slide.active { opacity: 1; transform: translateX(0); }
+    .ob-slide.prev { opacity: 0; transform: translateX(-100%); }
+    .ob-icon { font-size: 80px; margin-bottom: 24px; }
+    .ob-title { font-size: 26px; font-weight: 800; color: #1a1a1a; margin-bottom: 12px; line-height: 1.2; }
+    .ob-desc { font-size: 16px; color: #666; line-height: 1.6; max-width: 300px; }
+    .ob-dots { display: flex; justify-content: center; gap: 8px; padding: 20px 0; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 4px; background: #ddd; transition: all 0.3s; }
+    .ob-dot.active { background: #1a1a1a; width: 24px; }
+    .ob-footer { padding: 1rem 1.5rem 2rem; }
+    .ob-footer .btn-primary { background: #1a1a1a; color: #fff; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .ob-skip { text-align: center; margin-top: 12px; font-size: 13px; color: #aaa; cursor: pointer; padding: 8px; }
 
-    select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #1a1a1a; background: #fff; font-family: inherit; appearance: none; -webkit-appearance: none; outline: none; }
-    select:focus, textarea:focus { border-color: #4f6ef7; }
-    textarea { resize: none; height: 85px; }
-
-    .btn { width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 10px; transition: transform 0.1s, opacity 0.1s; }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: #1a1a1a; color: #fff; border: none; }
-    .btn-primary:hover { background: #333; }
-    .btn-outline { background: transparent; color: #1a1a1a; border: 1.5px solid #ddd; }
-    .btn-outline:hover { background: #f5f5f0; }
-
+    /* ── CADASTRO ── */
+    #s-cadastro { background: #fff; padding: 0; }
+    .cad-header { background: #1a1a1a; padding: 3rem 1.5rem 2rem; }
+    .cad-header h2 { font-size: 24px; font-weight: 800; color: #fff; }
+    .cad-header p { font-size: 14px; color: #aaa; margin-top: 4px; }
+    .cad-body { padding: 1.5rem; flex: 1; }
+    .field-group { margin-bottom: 20px; }
+    .field-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .field-input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; }
+    .field-input:focus { border-color: #4f6ef7; background: #fff; }
     .nivel-pills { display: flex; gap: 8px; }
-    .nivel-pill { flex: 1; padding: 10px 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1.5px solid #ddd; background: #fff; color: #888; text-align: center; transition: all 0.15s; }
+    .nivel-pill { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1.5px solid #eee; background: #fafaf8; color: #888; text-align: center; transition: all 0.15s; }
     .nivel-pill.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .field-select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; appearance: none; }
+    .field-select:focus { border-color: #4f6ef7; }
 
-    /* Painel de progresso no setup */
-    .progress-panel { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); border-radius: 16px; padding: 1.25rem; margin-bottom: 16px; color: #fff; }
-    .progress-panel .streak-big { font-size: 36px; font-weight: 800; color: #fbbf24; line-height: 1; }
-    .progress-panel .streak-lbl { font-size: 12px; color: #aaa; margin-bottom: 12px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .stat-box { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 8px; text-align: center; }
-    .stat-box .num { font-size: 18px; font-weight: 700; color: #fff; }
-    .stat-box .lbl2 { font-size: 10px; color: #aaa; margin-top: 2px; }
-    .calendar-row { display: flex; gap: 4px; flex-wrap: wrap; }
-    .cal-day { width: 20px; height: 20px; border-radius: 4px; background: rgba(255,255,255,0.1); }
-    .cal-day.active { background: #4f6ef7; }
-    .cal-day.today { background: #fbbf24; }
+    /* ── HOME ── */
+    #s-home { background: #f5f5f0; }
+    .home-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
+    .home-greet { font-size: 13px; color: #888; margin-bottom: 4px; }
+    .home-name { font-size: 22px; font-weight: 800; color: #fff; }
+    .home-streak { display: inline-flex; align-items: center; gap: 6px; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 20px; padding: 6px 14px; margin-top: 12px; }
+    .home-streak span { font-size: 14px; font-weight: 700; color: #fbbf24; }
+    .home-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
+    .home-section { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; margin-top: 20px; }
+    .home-section:first-child { margin-top: 0; }
+
+    /* Card de sessão */
+    .session-card { background: #4f6ef7; border-radius: 16px; padding: 1.5rem; margin-bottom: 16px; cursor: pointer; transition: transform 0.15s; }
+    .session-card:active { transform: scale(0.98); }
+    .session-card h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .session-card p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+    .session-card .sc-btn { display: inline-block; background: #fff; color: #4f6ef7; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 20px; margin-top: 14px; }
+
+    /* Stats cards */
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 1rem; }
+    .stat-card .sc-num { font-size: 28px; font-weight: 800; color: #1a1a1a; }
+    .stat-card .sc-lbl { font-size: 12px; color: #888; margin-top: 2px; }
+    .stat-card .sc-icon { font-size: 20px; margin-bottom: 8px; }
+
+    /* Calendário */
+    .cal-card { background: #fff; border-radius: 14px; padding: 1rem; margin-bottom: 16px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+    .cal-cell { aspect-ratio: 1; border-radius: 6px; background: #f5f5f0; }
+    .cal-cell.done { background: #4f6ef7; }
+    .cal-cell.today { background: #fbbf24; }
+    .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+    .cal-day-lbl { font-size: 9px; color: #bbb; text-align: center; font-weight: 600; }
 
     /* Badges */
-    .badges-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.12); border-radius: 20px; padding: 4px 10px; font-size: 11px; color: #fff; }
-    .badge.locked { opacity: 0.35; }
+    .badges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .badge-card { background: #fff; border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 10px; }
+    .badge-card.locked { opacity: 0.4; }
+    .badge-card .bi { font-size: 28px; }
+    .badge-card .bt { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+    .badge-card .bd { font-size: 10px; color: #888; margin-top: 2px; }
 
-    .streak-bar { display: flex; align-items: center; gap: 10px; background: #fff8f0; border: 1px solid #ffe0b2; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
-    .streak-num { font-size: 22px; font-weight: 700; color: #f57c00; }
-    .streak-label { font-size: 13px; color: #888; }
+    /* Configuração rápida */
+    .config-card { background: #fff; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+    .config-row { display: flex; align-items: center; justify-content: space-between; }
+    .config-label { font-size: 14px; color: #1a1a1a; font-weight: 500; }
+    .config-value { font-size: 14px; color: #4f6ef7; font-weight: 600; }
+    .config-edit { font-size: 12px; color: #bbb; cursor: pointer; }
 
-    .article-card { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1.25rem; margin-bottom: 16px; }
-    .tag { display: inline-block; background: #eef2ff; color: #4f6ef7; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
-    .article-title { font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.45; margin-bottom: 10px; }
-    .article-meta { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 8px; }
-    .info-pill { display: inline-block; background: #f0fdf4; color: #16a34a; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 20px; margin-bottom: 16px; border: 1px solid #bbf7d0; }
+    /* ── ARTIGO ── */
+    #s-artigo { background: #fff; }
+    .art-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
+    .art-header h2 { font-size: 20px; font-weight: 700; color: #fff; }
+    .art-header p { font-size: 13px; color: #888; margin-top: 4px; }
+    .art-body { padding: 1.25rem; flex: 1; }
+    .art-card { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1.25rem; margin-bottom: 16px; }
+    .art-tag { display: inline-block; background: #eef2ff; color: #4f6ef7; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .art-title { font-size: 15px; font-weight: 700; color: #1a1a1a; line-height: 1.45; margin-bottom: 8px; }
+    .art-meta { font-size: 13px; color: #666; line-height: 1.5; }
+    .art-query { font-size: 12px; color: #4f6ef7; margin-top: 8px; }
+    .scholar-btn { display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; color: #4f6ef7; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 20px; text-decoration: none; margin-top: 12px; }
+    .info-pill { display: inline-block; background: #f0fdf4; color: #16a34a; font-size: 12px; font-weight: 500; padding: 8px 14px; border-radius: 20px; margin-bottom: 16px; border: 1px solid #bbf7d0; }
 
-    .progress-bar { height: 5px; background: #f0f0f0; border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #4f6ef7; border-radius: 3px; transition: width 0.4s ease; }
+    /* ── BOTÕES GERAIS ── */
+    .btn { width: 100%; padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 10px; transition: transform 0.1s; border: none; }
+    .btn:active { transform: scale(0.98); }
+    .btn-dark { background: #1a1a1a; color: #fff; }
+    .btn-dark:hover { background: #333; }
+    .btn-ghost { background: transparent; color: #888; border: 1.5px solid #eee; }
 
+    /* ── LOADING ── */
+    #s-loading { background: #fff; align-items: center; justify-content: center; }
+    .loading-inner { text-align: center; padding: 2rem; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top-color: #4f6ef7; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    .loading-msg { font-size: 15px; color: #888; }
+
+    /* ── PERGUNTAS ── */
+    #s-perguntas { background: #fff; padding: 1.25rem; }
+    .q-progress { height: 5px; background: #f0f0f0; border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+    .q-progress-fill { height: 100%; background: #4f6ef7; border-radius: 3px; transition: width 0.4s ease; }
     .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .q-num { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
     .q-nivel { font-size: 11px; color: #4f6ef7; font-weight: 600; background: #eef2ff; padding: 3px 8px; border-radius: 6px; }
-    .q-text { font-size: 16px; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin-bottom: 18px; }
-
-    .option { display: block; width: 100%; text-align: left; padding: 13px 16px; background: #fafaf8; border: 1.5px solid #e8e8e4; border-radius: 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: all 0.15s; line-height: 1.4; }
+    .q-text { font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.5; margin-bottom: 20px; }
+    .option { display: block; width: 100%; text-align: left; padding: 14px 16px; background: #fafaf8; border: 1.5px solid #e8e8e4; border-radius: 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: all 0.15s; line-height: 1.4; }
     .option:hover { background: #f0f0f0; border-color: #ccc; }
     .option.correct { background: #f0fdf4; border-color: #86efac; color: #15803d; }
     .option.wrong { background: #fff1f2; border-color: #fca5a5; color: #dc2626; }
     .expl { font-size: 13px; color: #555; background: #f8f9ff; border: 1px solid #e0e7ff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; line-height: 1.55; }
     .expl::before { content: '💡 '; }
 
-    .result-wrap { text-align: center; padding: 2rem 0 1rem; }
-    .result-icon { font-size: 64px; margin-bottom: 12px; animation: pop 0.4s ease; }
-    .result-score { font-size: 48px; font-weight: 800; color: #1a1a1a; }
-    .result-sub { font-size: 14px; color: #888; margin-top: 4px; margin-bottom: 20px; }
-    .result-feedback { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1.25rem; font-size: 14px; color: #555; line-height: 1.65; text-align: left; margin-bottom: 12px; }
+    /* ── RESULTADO ── */
+    #s-resultado { background: #f5f5f0; align-items: center; justify-content: flex-start; padding: 2rem 1.5rem; }
+    .res-top { text-align: center; width: 100%; padding: 1rem 0; }
+    .res-icon { font-size: 72px; animation: pop 0.4s ease; margin-bottom: 8px; }
+    .res-score { font-size: 52px; font-weight: 800; color: #1a1a1a; }
+    .res-sub { font-size: 14px; color: #888; margin-top: 4px; margin-bottom: 24px; }
+    .new-badge-card { background: #fef3c7; border: 1.5px solid #fbbf24; border-radius: 16px; padding: 16px; margin-bottom: 16px; text-align: center; width: 100%; display: none; animation: pop 0.4s ease; }
+    .nb-icon { font-size: 36px; }
+    .nb-title { font-size: 15px; font-weight: 700; color: #92400e; margin-top: 6px; }
+    .nb-desc { font-size: 12px; color: #b45309; }
+    .res-feedback { background: #fff; border-radius: 16px; padding: 1.25rem; font-size: 14px; color: #555; line-height: 1.65; width: 100%; margin-bottom: 16px; }
+    .res-btns { width: 100%; }
 
-    /* Novo badge conquistado */
-    .new-badge { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; display: none; text-align: center; }
-    .new-badge .badge-icon { font-size: 32px; }
-    .new-badge .badge-title { font-size: 14px; font-weight: 700; color: #92400e; margin-top: 4px; }
-    .new-badge .badge-desc { font-size: 12px; color: #b45309; }
-
-    .section-title { font-size: 18px; font-weight: 700; color: #1a1a1a; margin-bottom: 14px; }
-    .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
-    .footer { text-align: center; font-size: 11px; color: #ccc; padding: 24px 0 8px; }
+    .footer { text-align: center; font-size: 11px; color: #ccc; padding: 16px 0 8px; }
+    .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- SETUP -->
-  <div class="screen active" id="s-setup">
-    <div class="logo">
+  <!-- SPLASH -->
+  <div class="screen" id="s-splash">
+    <div class="splash-logo">
       <div class="atom">⚛️</div>
       <h1>CientistaDiário</h1>
       <p>Sua sessão de pesquisa diária</p>
+      <div class="splash-bar"></div>
     </div>
+  </div>
 
-    <!-- Painel de progresso -->
-    <div class="progress-panel" id="progress-panel">
-      <div class="streak-big" id="pp-streak">0🔥</div>
-      <div class="streak-lbl" id="pp-streak-lbl">dias de sequência</div>
-      <div class="stats-grid">
-        <div class="stat-box"><div class="num" id="pp-sessoes">0</div><div class="lbl2">sessões</div></div>
-        <div class="stat-box"><div class="num" id="pp-acertos">0</div><div class="lbl2">acertos</div></div>
-        <div class="stat-box"><div class="num" id="pp-pct">0%</div><div class="lbl2">aproveit.</div></div>
+  <!-- ONBOARDING -->
+  <div class="screen" id="s-onboarding">
+    <div class="ob-wrap">
+      <div class="ob-slides">
+        <div class="ob-slide active" id="ob0">
+          <div class="ob-icon">📰</div>
+          <h2 class="ob-title">Um artigo por dia</h2>
+          <p class="ob-desc">A IA seleciona artigos científicos reais baseados no seu projeto de pesquisa e nível acadêmico.</p>
+        </div>
+        <div class="ob-slide" id="ob1">
+          <div class="ob-icon">🧠</div>
+          <h2 class="ob-title">Perguntas no seu nível</h2>
+          <p class="ob-desc">Questões adaptadas para IC, Mestrado ou Doutorado — do básico à análise crítica avançada.</p>
+        </div>
+        <div class="ob-slide" id="ob2">
+          <div class="ob-icon">🔥</div>
+          <h2 class="ob-title">Construa seu streak</h2>
+          <p class="ob-desc">Estude todo dia, mantenha sua sequência e conquiste badges. A consistência é o que forma pesquisadores.</p>
+        </div>
       </div>
-      <div class="calendar-row" id="pp-calendar"></div>
-      <div class="badges-row" id="pp-badges"></div>
-    </div>
-
-    <div class="card">
-      <div class="lbl">Nível acadêmico</div>
-      <div class="nivel-pills">
-        <button class="nivel-pill selected" onclick="selecionarNivel('IC', this)">IC</button>
-        <button class="nivel-pill" onclick="selecionarNivel('Mestrado', this)">Mestrado</button>
-        <button class="nivel-pill" onclick="selecionarNivel('Doutorado', this)">Doutorado</button>
+      <div class="ob-dots">
+        <div class="ob-dot active" id="dot0"></div>
+        <div class="ob-dot" id="dot1"></div>
+        <div class="ob-dot" id="dot2"></div>
+      </div>
+      <div class="ob-footer">
+        <button class="btn-primary" id="ob-btn" onclick="obNext()">Próximo →</button>
+        <div class="ob-skip" onclick="irCadastro()">Pular</div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="lbl">Área de pesquisa</div>
-      <select id="area">
-        <option value="materiais">Ciência dos Materiais</option>
-        <option value="biologia">Biologia</option>
-        <option value="quimica">Química</option>
-        <option value="fisica">Física</option>
-        <option value="engenharia">Engenharia</option>
-        <option value="computacao">Ciência da Computação</option>
-        <option value="medicina">Medicina</option>
-        <option value="agronomia">Agronomia</option>
-      </select>
+  <!-- CADASTRO -->
+  <div class="screen" id="s-cadastro">
+    <div class="cad-header">
+      <h2>Vamos começar 🚀</h2>
+      <p>Conta um pouco sobre você e sua pesquisa</p>
     </div>
-
-    <div class="card">
-      <div class="lbl">Descrição do seu projeto de pesquisa</div>
-      <textarea id="projeto" placeholder="Descreva brevemente o que você está pesquisando. Ex: degradação fotocatalítica de corantes têxteis usando TiO₂ dopado com nitrogênio..."></textarea>
-      <p style="font-size:11px;color:#aaa;margin-top:6px;">O artigo sugerido será direcionado ao seu tema.</p>
+    <div class="cad-body">
+      <div class="field-group">
+        <div class="field-label">Seu nome</div>
+        <input type="text" class="field-input" id="cad-nome" placeholder="Ex: Douglas" />
+      </div>
+      <div class="field-group">
+        <div class="field-label">Nível acadêmico</div>
+        <div class="nivel-pills">
+          <button class="nivel-pill selected" onclick="selecionarNivel('IC', this)">IC</button>
+          <button class="nivel-pill" onclick="selecionarNivel('Mestrado', this)">Mestrado</button>
+          <button class="nivel-pill" onclick="selecionarNivel('Doutorado', this)">Doutorado</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Área de pesquisa</div>
+        <select class="field-select" id="cad-area">
+          <option value="materiais">Ciência dos Materiais</option>
+          <option value="biologia">Biologia</option>
+          <option value="quimica">Química</option>
+          <option value="fisica">Física</option>
+          <option value="engenharia">Engenharia</option>
+          <option value="computacao">Ciência da Computação</option>
+          <option value="medicina">Medicina</option>
+          <option value="agronomia">Agronomia</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Descreva seu projeto</div>
+        <textarea class="field-input" id="cad-projeto" placeholder="Ex: degradação fotocatalítica de corantes usando ZnO dopado com európio..." style="height:85px;resize:none;"></textarea>
+      </div>
+      <button class="btn btn-dark" onclick="salvarCadastro()">Começar a estudar →</button>
+      <p class="err" id="err-cad"></p>
     </div>
+  </div>
 
-    <button class="btn btn-primary" onclick="iniciar()">Iniciar sessão de hoje →</button>
-    <p class="err" id="err-setup"></p>
-    <div class="footer">CientistaDiário · Protótipo v0.2</div>
+  <!-- HOME -->
+  <div class="screen" id="s-home">
+    <div class="home-header">
+      <div class="home-greet">Bem-vindo de volta,</div>
+      <div class="home-name" id="home-nome">Pesquisador</div>
+      <div class="home-streak">
+        <span id="home-streak-num">0🔥</span>
+        <span style="font-size:13px;color:#aaa;" id="home-streak-lbl">dias de sequência</span>
+      </div>
+    </div>
+    <div class="home-body">
+
+      <!-- Botão iniciar sessão -->
+      <div class="session-card" onclick="iniciarSessao()">
+        <h3>Sessão de hoje</h3>
+        <p id="home-sessao-desc">A IA vai sugerir um artigo baseado no seu projeto e gerar perguntas personalizadas.</p>
+        <div class="sc-btn">Iniciar agora →</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="home-section">Seu progresso</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="sc-icon">📚</div>
+          <div class="sc-num" id="h-sessoes">0</div>
+          <div class="sc-lbl">sessões completadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">🎯</div>
+          <div class="sc-num" id="h-pct">0%</div>
+          <div class="sc-lbl">de aproveitamento</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">✅</div>
+          <div class="sc-num" id="h-acertos">0</div>
+          <div class="sc-lbl">respostas certas</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">⚡</div>
+          <div class="sc-num" id="h-maior">0</div>
+          <div class="sc-lbl">maior sequência</div>
+        </div>
+      </div>
+
+      <!-- Calendário -->
+      <div class="home-section">Histórico de estudos</div>
+      <div class="cal-card">
+        <div class="cal-days-header">
+          <div class="cal-day-lbl">D</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div>
+          <div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div>
+          <div class="cal-day-lbl">S</div>
+        </div>
+        <div class="cal-grid" id="h-calendar"></div>
+      </div>
+
+      <!-- Badges -->
+      <div class="home-section">Conquistas</div>
+      <div class="badges-grid" id="h-badges"></div>
+
+      <!-- Config -->
+      <div class="home-section">Configurações</div>
+      <div class="config-card" onclick="irEditarPerfil()">
+        <div class="config-row">
+          <div>
+            <div class="config-label" id="cfg-nivel">IC</div>
+            <div style="font-size:11px;color:#aaa;" id="cfg-area">Ciência dos Materiais</div>
+          </div>
+          <div class="config-edit">Editar →</div>
+        </div>
+      </div>
+
+      <div class="footer">CientistaDiário · v0.2</div>
+    </div>
   </div>
 
   <!-- LOADING -->
   <div class="screen" id="s-loading">
-    <div style="text-align:center;padding:4rem 1rem;">
-      <div style="width:36px;height:36px;border:3px solid #eee;border-top-color:#4f6ef7;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;"></div>
-      <p id="loading-msg" style="font-size:15px;color:#888;">Aguarde...</p>
+    <div class="loading-inner">
+      <div class="spinner"></div>
+      <p class="loading-msg" id="loading-msg">Aguarde...</p>
     </div>
   </div>
 
   <!-- ARTIGO -->
   <div class="screen" id="s-artigo">
-    <div class="streak-bar">
-      <span class="streak-num" id="art-streak">🔥 0</span>
-      <span class="streak-label" id="art-streak-lbl">dias de sequência</span>
+    <div class="art-header">
+      <h2>Artigo de hoje</h2>
+      <p id="art-nivel-area">—</p>
     </div>
-    <div class="section-title">Artigo de hoje</div>
-    <div class="article-card">
-      <span class="tag" id="art-area">—</span>
-      <p class="article-title" id="art-titulo">—</p>
-      <p class="article-meta" id="art-meta">—</p>
-      <p id="art-projeto-label" style="font-size:12px;color:#4f6ef7;margin-top:6px;display:none;"></p>
-      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-        <a id="art-scholar" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:#eef2ff;color:#4f6ef7;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;text-decoration:none;">🎓 Buscar no Google Acadêmico</a>
+    <div class="art-body">
+      <div class="art-card">
+        <span class="art-tag" id="art-tag">—</span>
+        <p class="art-title" id="art-titulo">—</p>
+        <p class="art-meta" id="art-meta">—</p>
+        <p class="art-query" id="art-query" style="display:none;"></p>
+        <a id="art-scholar" href="#" target="_blank" class="scholar-btn">🎓 Buscar no Google Acadêmico</a>
       </div>
+      <div class="info-pill">📖 Leia o artigo antes de continuar</div>
+      <button class="btn btn-dark" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
+      <button class="btn btn-ghost" onclick="show('s-home')">Voltar ao início</button>
     </div>
-    <span class="info-pill">📖 Leia o artigo antes de continuar</span>
-    <button class="btn btn-primary" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
-    <button class="btn btn-outline" onclick="voltarSetup()">Trocar configuração</button>
   </div>
 
   <!-- PERGUNTAS -->
   <div class="screen" id="s-perguntas">
-    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <div class="q-progress"><div class="q-progress-fill" id="prog" style="width:0%"></div></div>
     <div class="q-header">
       <span class="q-num" id="q-num">Pergunta 1 de 4</span>
       <span class="q-nivel" id="q-nivel">IC</span>
@@ -193,24 +364,25 @@
     <div class="q-text" id="q-text"></div>
     <div id="opts"></div>
     <div id="expl-box"></div>
-    <button class="btn btn-primary" id="btn-prox" style="display:none;margin-top:14px" onclick="proxima()">Próxima →</button>
+    <button class="btn btn-dark" id="btn-prox" style="display:none;margin-top:14px" onclick="proxima()">Próxima →</button>
   </div>
 
   <!-- RESULTADO -->
   <div class="screen" id="s-resultado">
-    <div class="result-wrap">
-      <div class="result-icon" id="res-icon">🎉</div>
-      <div class="result-score" id="res-score">0/4</div>
-      <div class="result-sub">perguntas certas</div>
+    <div class="res-top">
+      <div class="res-icon" id="res-icon">🎉</div>
+      <div class="res-score" id="res-score">0/4</div>
+      <div class="res-sub">perguntas certas</div>
     </div>
-    <div class="new-badge" id="new-badge">
-      <div class="badge-icon" id="nb-icon">🏅</div>
-      <div class="badge-title" id="nb-title">Badge conquistado!</div>
-      <div class="badge-desc" id="nb-desc"></div>
+    <div class="new-badge-card" id="new-badge">
+      <div class="nb-icon" id="nb-icon">🏅</div>
+      <div class="nb-title" id="nb-title">Badge conquistado!</div>
+      <div class="nb-desc" id="nb-desc"></div>
     </div>
-    <div class="result-feedback" id="res-feedback"></div>
-    <button class="btn btn-primary" onclick="voltarSetup()">Nova sessão →</button>
-    <div class="footer">CientistaDiário · Protótipo v0.2</div>
+    <div class="res-feedback" id="res-feedback"></div>
+    <div class="res-btns">
+      <button class="btn btn-dark" onclick="voltarHome()">Voltar ao início →</button>
+    </div>
   </div>
 
 </div>
@@ -219,264 +391,280 @@
 const API_KEY = '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';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// ── PROGRESSO ──────────────────────────────────────────────
+// ── BADGES ────────────────────────────────────────────────
 const BADGES_DEF = [
-  { id: 'first',    icon: '🌱', title: 'Primeiro passo',    desc: 'Completou sua primeira sessão',  cond: p => p.sessoes >= 1 },
-  { id: 'streak3',  icon: '🔥', title: '3 dias seguidos',   desc: '3 dias de sequência',            cond: p => p.streakAtual >= 3 },
-  { id: 'streak7',  icon: '⚡', title: 'Uma semana!',       desc: '7 dias de sequência',            cond: p => p.streakAtual >= 7 },
-  { id: 'streak30', icon: '🏆', title: 'Mês científico',    desc: '30 dias de sequência',           cond: p => p.streakAtual >= 30 },
-  { id: 'acc10',    icon: '🎯', title: '10 acertos',        desc: 'Acumulou 10 respostas certas',   cond: p => p.totalAcertos >= 10 },
-  { id: 'acc50',    icon: '💡', title: '50 acertos',        desc: 'Acumulou 50 respostas certas',   cond: p => p.totalAcertos >= 50 },
-  { id: 'perfect',  icon: '⭐', title: 'Sessão perfeita',   desc: 'Acertou tudo em uma sessão',     cond: p => p.sessoesPerfei >= 1 },
-  { id: 'sess10',   icon: '📚', title: '10 sessões',        desc: 'Completou 10 sessões de estudo', cond: p => p.sessoes >= 10 },
+  { id:'first',    icon:'🌱', title:'Primeiro passo',  desc:'Completou a primeira sessão',    cond:p=>p.sessoes>=1 },
+  { id:'streak3',  icon:'🔥', title:'3 dias seguidos', desc:'3 dias de sequência',             cond:p=>p.streakAtual>=3 },
+  { id:'streak7',  icon:'⚡', title:'Uma semana!',     desc:'7 dias de sequência',             cond:p=>p.streakAtual>=7 },
+  { id:'streak30', icon:'🏆', title:'Mês científico',  desc:'30 dias de sequência',            cond:p=>p.streakAtual>=30 },
+  { id:'acc10',    icon:'🎯', title:'10 acertos',      desc:'Acumulou 10 respostas certas',    cond:p=>p.totalAcertos>=10 },
+  { id:'acc50',    icon:'💡', title:'50 acertos',      desc:'Acumulou 50 respostas certas',    cond:p=>p.totalAcertos>=50 },
+  { id:'perfect',  icon:'⭐', title:'Sessão perfeita', desc:'Acertou tudo em uma sessão',      cond:p=>p.sessoesPerfei>=1 },
+  { id:'sess10',   icon:'📚', title:'10 sessões',      desc:'Completou 10 sessões de estudo',  cond:p=>p.sessoes>=10 },
 ];
 
+// ── STORAGE ───────────────────────────────────────────────
 function loadProgress() {
-  try {
-    const raw = localStorage.getItem('cd_progress');
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return { sessoes: 0, totalAcertos: 0, totalPerguntas: 0, streakAtual: 0, maiorStreak: 0, badges: [], sessoesPerfei: 0, dias: [] };
+  try { const r=localStorage.getItem('cd_progress'); if(r) return JSON.parse(r); } catch(e){}
+  return {sessoes:0,totalAcertos:0,totalPerguntas:0,streakAtual:0,maiorStreak:0,badges:[],sessoesPerfei:0,dias:[]};
 }
-
-function saveProgress(p) {
-  localStorage.setItem('cd_progress', JSON.stringify(p));
+function saveProgress(p) { localStorage.setItem('cd_progress',JSON.stringify(p)); }
+function loadPerfil() {
+  try { const r=localStorage.getItem('cd_perfil'); if(r) return JSON.parse(r); } catch(e){}
+  return null;
 }
-
-function hoje() {
-  return new Date().toISOString().slice(0, 10);
-}
+function savePerfil(p) { localStorage.setItem('cd_perfil',JSON.stringify(p)); }
+function hoje() { return new Date().toISOString().slice(0,10); }
 
 function atualizarStreak(p) {
-  const d = hoje();
-  if (p.dias.includes(d)) return; // já estudou hoje
+  const d=hoje();
+  if(p.dias.includes(d)) return;
   p.dias.push(d);
-  if (p.dias.length > 60) p.dias = p.dias.slice(-60);
-  // verificar se ontem estava na lista
-  const ontem = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  if (p.dias.includes(ontem)) {
-    p.streakAtual++;
-  } else {
-    p.streakAtual = 1;
-  }
-  if (p.streakAtual > p.maiorStreak) p.maiorStreak = p.streakAtual;
+  if(p.dias.length>60) p.dias=p.dias.slice(-60);
+  const ontem=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  p.streakAtual = p.dias.includes(ontem) ? p.streakAtual+1 : 1;
+  if(p.streakAtual>p.maiorStreak) p.maiorStreak=p.streakAtual;
 }
-
 function checarBadges(p) {
-  const novos = [];
-  for (const b of BADGES_DEF) {
-    if (!p.badges.includes(b.id) && b.cond(p)) {
-      p.badges.push(b.id);
-      novos.push(b);
-    }
-  }
+  const novos=[];
+  for(const b of BADGES_DEF) { if(!p.badges.includes(b.id)&&b.cond(p)){p.badges.push(b.id);novos.push(b);} }
   return novos;
 }
 
-function renderProgress() {
-  const p = loadProgress();
-  document.getElementById('pp-streak').textContent = p.streakAtual + '🔥';
-  document.getElementById('pp-streak-lbl').textContent = p.streakAtual === 1 ? 'dia de sequência' : 'dias de sequência';
-  document.getElementById('pp-sessoes').textContent = p.sessoes;
-  document.getElementById('pp-acertos').textContent = p.totalAcertos;
-  const pct = p.totalPerguntas > 0 ? Math.round(p.totalAcertos / p.totalPerguntas * 100) : 0;
-  document.getElementById('pp-pct').textContent = pct + '%';
+// ── RENDER HOME ───────────────────────────────────────────
+function renderHome() {
+  const p=loadProgress(), perf=loadPerfil();
+  if(perf) {
+    document.getElementById('home-nome').textContent = perf.nome || 'Pesquisador';
+    document.getElementById('cfg-nivel').textContent = perf.nivel || 'IC';
+    document.getElementById('cfg-area').textContent = perf.areaNome || '';
+    document.getElementById('home-sessao-desc').textContent = perf.projeto ? '"' + perf.projeto.substring(0,80) + (perf.projeto.length>80?'…':'') + '"' : 'A IA vai sugerir um artigo baseado no seu projeto.';
+  }
+  document.getElementById('home-streak-num').textContent = p.streakAtual+'🔥';
+  document.getElementById('home-streak-lbl').textContent = p.streakAtual===1?'dia de sequência':'dias de sequência';
+  document.getElementById('h-sessoes').textContent = p.sessoes;
+  const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
+  document.getElementById('h-pct').textContent = pct+'%';
+  document.getElementById('h-acertos').textContent = p.totalAcertos;
+  document.getElementById('h-maior').textContent = p.maiorStreak;
 
-  // calendário últimos 28 dias
-  const cal = document.getElementById('pp-calendar');
-  cal.innerHTML = '';
-  const todayStr = hoje();
-  for (let i = 27; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-    const el = document.createElement('div');
-    el.className = 'cal-day' + (p.dias.includes(d) ? ' active' : '') + (d === todayStr ? ' today' : '');
+  // calendário
+  const cal=document.getElementById('h-calendar'); cal.innerHTML='';
+  // alinhar com dia da semana
+  const todayDate=new Date(); const todayStr=hoje();
+  const startDate=new Date(todayDate); startDate.setDate(startDate.getDate()-27);
+  const startDow=startDate.getDay(); // 0=dom
+  for(let i=0;i<startDow;i++){const e=document.createElement('div');cal.appendChild(e);}
+  for(let i=27;i>=0;i--){
+    const d=new Date(Date.now()-i*86400000).toISOString().slice(0,10);
+    const el=document.createElement('div');
+    el.className='cal-cell'+(p.dias.includes(d)?' done':'')+(d===todayStr?' today':'');
     cal.appendChild(el);
   }
 
   // badges
-  const badgesEl = document.getElementById('pp-badges');
-  badgesEl.innerHTML = '';
-  for (const b of BADGES_DEF) {
-    const el = document.createElement('div');
-    el.className = 'badge' + (p.badges.includes(b.id) ? '' : ' locked');
-    el.textContent = b.icon + ' ' + b.title;
-    badgesEl.appendChild(el);
+  const bg=document.getElementById('h-badges'); bg.innerHTML='';
+  for(const b of BADGES_DEF){
+    const el=document.createElement('div');
+    el.className='badge-card'+(p.badges.includes(b.id)?'':' locked');
+    el.innerHTML='<div class="bi">'+b.icon+'</div><div><div class="bt">'+b.title+'</div><div class="bd">'+b.desc+'</div></div>';
+    bg.appendChild(el);
   }
-
-  // streak no artigo
-  document.getElementById('art-streak').textContent = '🔥 ' + p.streakAtual;
-  document.getElementById('art-streak-lbl').textContent = p.streakAtual === 1 ? 'dia de sequência' : 'dias de sequência';
 }
 
-// ── IA ────────────────────────────────────────────────────
-async function chamarIA(prompt) {
-  const resp = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY, 'HTTP-Referer': window.location.href },
-    body: JSON.stringify({ model: 'openrouter/auto', messages: [{ role: 'user', content: prompt }], max_tokens: 1200 })
-  });
-  if (!resp.ok) throw new Error('Erro na API: ' + resp.status);
-  const data = await resp.json();
-  return data.choices[0].message.content;
+// ── ONBOARDING ────────────────────────────────────────────
+let obSlide=0;
+function obNext() {
+  if(obSlide<2) {
+    document.getElementById('ob'+obSlide).classList.remove('active');
+    document.getElementById('ob'+obSlide).classList.add('prev');
+    document.getElementById('dot'+obSlide).classList.remove('active');
+    obSlide++;
+    document.getElementById('ob'+obSlide).classList.add('active');
+    document.getElementById('dot'+obSlide).classList.add('active');
+    if(obSlide===2) document.getElementById('ob-btn').textContent='Começar →';
+  } else {
+    irCadastro();
+  }
 }
+function irCadastro() { show('s-cadastro'); }
 
-function setLoading(msg) {
-  document.getElementById('loading-msg').textContent = msg;
-  show('s-loading');
-}
-
-function gerarQueryScholar(texto) {
-  const stop = ['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','o','a','os','as','e','é','ao','se','sobre','como','foi','ser','estudo','análise','pesquisa'];
-  return texto.toLowerCase().replace(/[^\w\sáàãâéêíóôõúüç]/g,' ').split(/\s+/).filter(p=>p.length>2&&!stop.includes(p)).slice(0,6).join(' ');
-}
-
-// ── ESTADO ────────────────────────────────────────────────
-let nivelAtual = 'IC';
-let estado = { nivel:'IC', area:'materiais', artigo:null, perguntas:[], qAtual:0, acertos:0, projeto:'' };
-
-function selecionarNivel(nivel, el) {
-  nivelAtual = nivel;
-  document.querySelectorAll('.nivel-pill').forEach(p => p.classList.remove('selected'));
+// ── CADASTRO ──────────────────────────────────────────────
+let nivelAtual='IC';
+function selecionarNivel(nivel,el) {
+  nivelAtual=nivel;
+  document.querySelectorAll('.nivel-pill').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+function salvarCadastro() {
+  const nome=document.getElementById('cad-nome').value.trim();
+  if(!nome){document.getElementById('err-cad').textContent='Digite seu nome para continuar.';return;}
+  const areaEl=document.getElementById('cad-area');
+  const areaNome=areaEl.options[areaEl.selectedIndex].text;
+  const projeto=document.getElementById('cad-projeto').value.trim();
+  savePerfil({nome, nivel:nivelAtual, area:areaEl.value, areaNome, projeto});
+  localStorage.setItem('cd_onboarding','done');
+  renderHome();
+  show('s-home');
 }
 
-// ── FLUXO ─────────────────────────────────────────────────
-async function iniciar() {
-  estado.nivel = nivelAtual;
-  estado.area = document.getElementById('area').value;
-  estado.projeto = document.getElementById('projeto').value.trim();
-  estado.perguntas = [];
-  document.getElementById('err-setup').textContent = '';
-  const areaLabel = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
+function irEditarPerfil() {
+  const perf=loadPerfil();
+  if(perf){
+    document.getElementById('cad-nome').value=perf.nome||'';
+    document.getElementById('cad-area').value=perf.area||'materiais';
+    document.getElementById('cad-projeto').value=perf.projeto||'';
+    nivelAtual=perf.nivel||'IC';
+    document.querySelectorAll('.nivel-pill').forEach(p=>{
+      p.classList.toggle('selected', p.textContent===nivelAtual);
+    });
+  }
+  show('s-cadastro');
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function setLoading(msg) { document.getElementById('loading-msg').textContent=msg; show('s-loading'); }
+
+// ── IA ────────────────────────────────────────────────────
+async function chamarIA(prompt) {
+  const resp=await fetch(API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY,'HTTP-Referer':window.location.href},
+    body:JSON.stringify({model:'openrouter/auto',messages:[{role:'user',content:prompt}],max_tokens:1200})
+  });
+  if(!resp.ok) throw new Error('Erro na API: '+resp.status);
+  const data=await resp.json();
+  return data.choices[0].message.content;
+}
+
+function gerarQueryScholar(texto) {
+  const stop=['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','o','a','os','as','e','é','ao','se','sobre','como','foi','ser','estudo','análise','pesquisa'];
+  return texto.toLowerCase().replace(/[^\w\sáàãâéêíóôõúüç]/g,' ').split(/\s+/).filter(p=>p.length>2&&!stop.includes(p)).slice(0,6).join(' ');
+}
+
+// ── FLUXO SESSÃO ──────────────────────────────────────────
+let estado={artigo:null,perguntas:[],qAtual:0,acertos:0};
+
+async function iniciarSessao() {
+  const perf=loadPerfil();
+  if(!perf){show('s-cadastro');return;}
   setLoading('A IA está buscando um artigo para o seu projeto...');
   try {
-    const projetoInfo = estado.projeto ? 'O projeto de pesquisa do estudante é: "' + estado.projeto + '".' : 'Área de pesquisa: ' + areaLabel + '.';
-    const txt = await chamarIA(`Você é um orientador acadêmico. ${projetoInfo} Sugira UM artigo científico real, relevante e existente para um estudante de ${estado.nivel} em ${areaLabel}. O artigo deve existir de verdade e ser encontrável no Google Acadêmico. Responda APENAS com JSON válido, sem markdown: {"titulo":"título exato do artigo","autores":"Sobrenome, A. et al. (ano)","resumo":"2 frases descrevendo o artigo em português","query_scholar":"3 a 5 palavras-chave para buscar no Google Acadêmico"}`);
-    const artigo = JSON.parse(txt.replace(/\`\`\`json|\`\`\`/g,'').trim());
-    estado.artigo = artigo;
-    document.getElementById('art-area').textContent = areaLabel + ' · ' + estado.nivel;
-    document.getElementById('art-titulo').textContent = artigo.titulo;
-    document.getElementById('art-meta').textContent = artigo.autores + ' — ' + artigo.resumo;
-    const query = artigo.query_scholar || gerarQueryScholar(artigo.titulo);
-    document.getElementById('art-scholar').href = 'https://scholar.google.com/scholar?q=' + encodeURIComponent(query) + '&hl=pt-BR';
-    const pl = document.getElementById('art-projeto-label');
-    if (estado.projeto) { pl.style.display='block'; pl.textContent = '🔍 Busca: "' + query + '"'; }
-    else { pl.style.display='none'; }
-    renderProgress();
+    const areaEl=document.getElementById('cad-area');
+    const areaNome=perf.areaNome||'Ciência dos Materiais';
+    const projetoInfo=perf.projeto?'O projeto de pesquisa do estudante é: "'+perf.projeto+'".':`Área: ${areaNome}.`;
+    const txt=await chamarIA(`Você é um orientador acadêmico. ${projetoInfo} Sugira UM artigo científico real e existente para um estudante de ${perf.nivel} em ${areaNome}. Responda APENAS com JSON válido, sem markdown: {"titulo":"título do artigo","autores":"Autor et al. (ano)","resumo":"2 frases em português","query_scholar":"3-5 palavras-chave"}`);
+    const artigo=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    estado.artigo=artigo;
+    document.getElementById('art-tag').textContent=areaNome+' · '+perf.nivel;
+    document.getElementById('art-nivel-area').textContent=areaNome+' · '+perf.nivel;
+    document.getElementById('art-titulo').textContent=artigo.titulo;
+    document.getElementById('art-meta').textContent=artigo.autores+' — '+artigo.resumo;
+    const query=artigo.query_scholar||gerarQueryScholar(artigo.titulo);
+    document.getElementById('art-scholar').href='https://scholar.google.com/scholar?q='+encodeURIComponent(query)+'&hl=pt-BR';
+    const aq=document.getElementById('art-query');
+    aq.style.display='block'; aq.textContent='🔍 Busca: "'+query+'"';
     show('s-artigo');
-  } catch(e) {
-    show('s-setup');
-    document.getElementById('err-setup').textContent = 'Erro ao buscar artigo. Tente novamente.';
-  }
+  } catch(e) { show('s-home'); alert('Erro ao buscar artigo. Tente novamente.'); }
 }
 
 async function irPerguntas() {
+  const perf=loadPerfil()||{nivel:'IC'};
   setLoading('Gerando perguntas personalizadas para o seu nível...');
   try {
-    const txt = await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${estado.nivel} sobre o artigo "${estado.artigo.titulo}". REGRAS: responda APENAS com um array JSON puro, sem texto antes, sem texto depois, sem markdown, sem backticks. Dificuldade: IC=compreensão básica, Mestrado=análise crítica, Doutorado=síntese avançada. FORMATO EXATO: [{"pergunta":"texto da pergunta aqui","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação curta"}] O campo correta é o índice 0-3 da opção correta.`);const clean = txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
-    const match = clean.match(/\[[\s\S]*\]/);
-let parsed = null;
-try { parsed = JSON.parse(clean); } catch(e) {}
-if (!Array.isArray(parsed)) { try { parsed = JSON.parse(match ? match[0] : '[]'); } catch(e) {} }
-if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('JSON inválido');
-estado.perguntas = parsed;
-    estado.qAtual = 0; estado.acertos = 0;
+    const txt=await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${perf.nivel} sobre o artigo "${estado.artigo.titulo}". REGRAS: responda APENAS com um array JSON puro, sem texto antes, sem texto depois, sem markdown, sem backticks. Dificuldade: IC=compreensão básica, Mestrado=análise crítica, Doutorado=síntese avançada. FORMATO EXATO: [{"pergunta":"texto da pergunta aqui","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação curta"}] O campo correta é o índice 0-3 da opção correta.`);
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const match=clean.match(/\[[\s\S]*\]/);
+    let parsed=null;
+    try{parsed=JSON.parse(clean);}catch(e){}
+    if(!Array.isArray(parsed)){try{parsed=JSON.parse(match?match[0]:'[]');}catch(e){}}
+    if(!Array.isArray(parsed)||parsed.length===0) throw new Error('JSON inválido');
+    estado.perguntas=parsed; estado.qAtual=0; estado.acertos=0;
     showQ(); show('s-perguntas');
-  } catch(e) {
-    show('s-artigo');
-    alert('Erro ao gerar perguntas. Tente novamente.');
-  }
+  } catch(e) { show('s-artigo'); alert('Erro ao gerar perguntas. Tente novamente.'); }
 }
 
 function showQ() {
-  const q = estado.perguntas[estado.qAtual];
-  const total = estado.perguntas.length;
-  document.getElementById('prog').style.width = (estado.qAtual / total * 100) + '%';
-  document.getElementById('q-num').textContent = 'Pergunta ' + (estado.qAtual+1) + ' de ' + total;
-  document.getElementById('q-nivel').textContent = estado.nivel;
-  document.getElementById('q-text').textContent = q.pergunta;
-  document.getElementById('expl-box').innerHTML = '';
-  document.getElementById('btn-prox').style.display = 'none';
-  const opts = document.getElementById('opts');
-  opts.innerHTML = '';
-  q.opcoes.forEach(function(op, i) {
-    const b = document.createElement('button');
-    b.className = 'option'; b.textContent = op;
-    b.onclick = function() { responder(i, b); };
+  const q=estado.perguntas[estado.qAtual], total=estado.perguntas.length;
+  const perf=loadPerfil()||{nivel:'IC'};
+  document.getElementById('prog').style.width=(estado.qAtual/total*100)+'%';
+  document.getElementById('q-num').textContent='Pergunta '+(estado.qAtual+1)+' de '+total;
+  document.getElementById('q-nivel').textContent=perf.nivel;
+  document.getElementById('q-text').textContent=q.pergunta;
+  document.getElementById('expl-box').innerHTML='';
+  document.getElementById('btn-prox').style.display='none';
+  const opts=document.getElementById('opts'); opts.innerHTML='';
+  q.opcoes.forEach(function(op,i){
+    const b=document.createElement('button');
+    b.className='option'; b.textContent=op;
+    b.onclick=function(){responder(i,b);};
     opts.appendChild(b);
   });
 }
 
-function responder(idx, btn) {
-  const q = estado.perguntas[estado.qAtual];
-  document.querySelectorAll('.option').forEach(function(b) { b.onclick = null; });
-  if (idx === q.correta) { btn.classList.add('correct'); estado.acertos++; }
-  else { btn.classList.add('wrong'); document.querySelectorAll('.option')[q.correta].classList.add('correct'); }
-  const expl = document.createElement('div');
-  expl.className = 'expl'; expl.textContent = q.explicacao;
+function responder(idx,btn) {
+  const q=estado.perguntas[estado.qAtual];
+  document.querySelectorAll('.option').forEach(function(b){b.onclick=null;});
+  if(idx===q.correta){btn.classList.add('correct');estado.acertos++;}
+  else{btn.classList.add('wrong');document.querySelectorAll('.option')[q.correta].classList.add('correct');}
+  const expl=document.createElement('div');
+  expl.className='expl'; expl.textContent=q.explicacao;
   document.getElementById('expl-box').appendChild(expl);
-  document.getElementById('btn-prox').style.display = 'block';
+  document.getElementById('btn-prox').style.display='block';
 }
 
 function proxima() {
   estado.qAtual++;
-  if (estado.qAtual < estado.perguntas.length) showQ();
+  if(estado.qAtual<estado.perguntas.length) showQ();
   else mostrarResultado();
 }
 
 async function mostrarResultado() {
-  const ac = estado.acertos;
-  const tot = estado.perguntas.length;
-  const pct = ac / tot;
-
-  // Salvar progresso
-  const p = loadProgress();
-  atualizarStreak(p);
-  p.sessoes++;
-  p.totalAcertos += ac;
-  p.totalPerguntas += tot;
-  if (pct === 1) p.sessoesPerfei = (p.sessoesPerfei || 0) + 1;
-  const novoBadges = checarBadges(p);
-  saveProgress(p);
-
-  document.getElementById('res-icon').textContent = pct === 1 ? '🏆' : pct >= 0.5 ? '🎯' : '📚';
-  document.getElementById('res-score').textContent = ac + '/' + tot;
-  document.getElementById('prog').style.width = '100%';
-
-  // Mostrar badge novo se tiver
-  if (novoBadges.length > 0) {
-    const b = novoBadges[0];
-    document.getElementById('nb-icon').textContent = b.icon;
-    document.getElementById('nb-title').textContent = b.title;
-    document.getElementById('nb-desc').textContent = b.desc;
-    document.getElementById('new-badge').style.display = 'block';
-  } else {
-    document.getElementById('new-badge').style.display = 'none';
-  }
-
+  const ac=estado.acertos, tot=estado.perguntas.length, pct=ac/tot;
+  const p=loadProgress();
+  atualizarStreak(p); p.sessoes++; p.totalAcertos+=ac; p.totalPerguntas+=tot;
+  if(pct===1) p.sessoesPerfei=(p.sessoesPerfei||0)+1;
+  const novoBadges=checarBadges(p); saveProgress(p);
+  document.getElementById('res-icon').textContent=pct===1?'🏆':pct>=0.5?'🎯':'📚';
+  document.getElementById('res-score').textContent=ac+'/'+tot;
+  document.getElementById('prog').style.width='100%';
+  if(novoBadges.length>0){
+    const b=novoBadges[0];
+    document.getElementById('nb-icon').textContent=b.icon;
+    document.getElementById('nb-title').textContent=b.title;
+    document.getElementById('nb-desc').textContent=b.desc;
+    document.getElementById('new-badge').style.display='block';
+  } else { document.getElementById('new-badge').style.display='none'; }
   setLoading('Preparando seu feedback...');
   try {
-    const feedback = await chamarIA(`Estudante de ${estado.nivel} acertou ${ac} de ${tot} perguntas sobre "${estado.artigo.titulo}". Dê um feedback motivador e construtivo em 2-3 frases em português.`);
-    document.getElementById('res-feedback').textContent = feedback;
+    const feedback=await chamarIA(`Estudante acertou ${ac} de ${tot} perguntas sobre "${estado.artigo.titulo}". Dê um feedback motivador em 2-3 frases em português.`);
+    document.getElementById('res-feedback').textContent=feedback;
   } catch(e) {
-    document.getElementById('res-feedback').textContent = pct === 1 ? 'Sessão perfeita! Excelente compreensão do artigo.' : pct >= 0.5 ? 'Bom desempenho! Continue praticando diariamente.' : 'Continue tentando! A leitura científica melhora com a prática.';
+    document.getElementById('res-feedback').textContent=pct===1?'Sessão perfeita! Excelente!':pct>=0.5?'Bom desempenho! Continue praticando.':'Continue tentando! A prática diária constrói expertise.';
   }
   show('s-resultado');
 }
 
-function voltarSetup() {
-  renderProgress();
-  show('s-setup');
+function voltarHome() { renderHome(); show('s-home'); }
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
+function init() {
+  const onboardingFeito=localStorage.getItem('cd_onboarding');
+  const perfil=loadPerfil();
+  show('s-splash');
+  setTimeout(function(){
+    if(!onboardingFeito||!perfil) { show('s-onboarding'); }
+    else { renderHome(); show('s-home'); }
+  }, 2000);
 }
 
-// Inicializar painel ao carregar
-renderProgress();
+init();
 </script>
 </body>
 </html>
