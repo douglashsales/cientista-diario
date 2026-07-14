@@ -211,6 +211,12 @@
       </select>
     </div>
 
+    <div class="card">
+      <div class="lbl">Descrição do seu projeto de pesquisa</div>
+      <textarea id="projeto" placeholder="Descreva brevemente o que você está pesquisando. Ex: estudo sobre degradação fotocatalítica de corantes têxteis usando TiO₂ dopado com nitrogênio sob luz visível..."></textarea>
+      <p style="font-size:11px;color:#aaa;margin-top:6px;">O artigo sugerido será direcionado ao seu tema.</p>
+    </div>
+
     <button class="btn btn-primary" onclick="iniciar()">Iniciar sessão de hoje →</button>
     <p class="err" id="err-setup"></p>
 
@@ -228,7 +234,13 @@
       <span class="tag" id="art-area">—</span>
       <p class="article-title" id="art-titulo">—</p>
       <p class="article-meta" id="art-meta">—</p>
-      <a class="doi-link" id="art-doi" href="#" target="_blank">—</a>
+      <p class="article-projeto" id="art-projeto-label" style="font-size:12px;color:#4f6ef7;margin-top:6px;display:none;">📌 Selecionado com base no seu projeto</p>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <a id="art-scholar" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:#eef2ff;color:#4f6ef7;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;text-decoration:none;">
+          🎓 Buscar no Google Acadêmico
+        </a>
+        <a class="doi-link" id="art-doi" href="#" target="_blank" style="display:inline-flex;align-items:center;font-size:12px;padding:6px 12px;background:#f5f5f0;border-radius:20px;color:#888;text-decoration:none;">DOI →</a>
+      </div>
     </div>
     <span class="info-pill">📖 Leia o artigo antes de continuar</span>
     <button class="btn btn-primary" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
@@ -516,6 +528,7 @@ function show(id) {
 function iniciar() {
   estado.nivel = nivelAtual;
   estado.area = document.getElementById('area').value;
+  estado.projeto = document.getElementById('projeto').value.trim();
   const dados = DB[estado.area] && DB[estado.area][estado.nivel];
   if (!dados) {
     document.getElementById('err-setup').textContent = 'Combinação ainda não disponível neste protótipo.';
@@ -528,9 +541,23 @@ function iniciar() {
   document.getElementById('art-area').textContent = areaLabel + ' · ' + estado.nivel;
   document.getElementById('art-titulo').textContent = a.titulo;
   document.getElementById('art-meta').textContent = a.autores + ' — ' + a.resumo;
+
   const doi = document.getElementById('art-doi');
-  doi.textContent = 'DOI: ' + a.doi;
+  doi.textContent = 'DOI →';
   doi.href = 'https://doi.org/' + a.doi;
+
+  const scholarQuery = encodeURIComponent(a.titulo);
+  const scholarLink = document.getElementById('art-scholar');
+  scholarLink.href = 'https://scholar.google.com/scholar?q=' + scholarQuery;
+
+  const projetoLabel = document.getElementById('art-projeto-label');
+  if (estado.projeto) {
+    projetoLabel.style.display = 'block';
+    projetoLabel.textContent = '📌 Selecionado com base no seu projeto: "' + estado.projeto.substring(0, 60) + (estado.projeto.length > 60 ? '…' : '') + '"';
+  } else {
+    projetoLabel.style.display = 'none';
+  }
+
   show('s-artigo');
 }
 
