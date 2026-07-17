@@ -6,184 +6,194 @@
   <title>CientistaDiário</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #1a1a1a; min-height: 100vh; }
-    .app { max-width: 420px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; }
-    .screen { display: none; min-height: 100vh; flex-direction: column; }
-    .screen.active { display: flex; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+    .app { max-width: 420px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; overflow: hidden; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes pop { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slideIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
 
-    /* SPLASH */
-    #s-splash { background:#1a1a1a; align-items:center; justify-content:center; }
-    .splash-logo { text-align:center; animation:pop 0.5s ease; }
-    .splash-logo .atom { font-size:72px; margin-bottom:16px; }
-    .splash-logo h1 { font-size:32px; font-weight:800; color:#fff; letter-spacing:-1px; }
-    .splash-logo p { font-size:15px; color:#888; margin-top:6px; }
-    .splash-bar { width:0; height:3px; background:#4f6ef7; border-radius:2px; margin:32px auto 0; animation:splashbar 2s ease forwards; }
-    @keyframes splashbar { to{width:200px} }
+    /* ── SPLASH ── */
+    #s-splash { background: #1a1a1a; align-items: center; justify-content: center; }
+    .splash-logo { text-align: center; animation: pop 0.5s ease; }
+    .splash-logo .atom { font-size: 72px; margin-bottom: 16px; }
+    .splash-logo h1 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+    .splash-logo p { font-size: 15px; color: #888; margin-top: 6px; }
+    .splash-bar { width: 60px; height: 3px; background: #4f6ef7; border-radius: 2px; margin: 32px auto 0; animation: splashbar 2s ease forwards; }
+    @keyframes splashbar { from{width:0} to{width:200px} }
 
-    /* ONBOARDING */
-    #s-onboarding { background:#fff; }
-    .ob-wrap { flex:1; display:flex; flex-direction:column; }
-    .ob-slides { flex:1; position:relative; overflow:hidden; }
-    .ob-slide { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; opacity:0; transform:translateX(100%); transition:all 0.4s ease; }
-    .ob-slide.active { opacity:1; transform:translateX(0); }
-    .ob-slide.prev { opacity:0; transform:translateX(-100%); }
-    .ob-icon { font-size:80px; margin-bottom:24px; }
-    .ob-title { font-size:26px; font-weight:800; color:#1a1a1a; margin-bottom:12px; line-height:1.2; }
-    .ob-desc { font-size:16px; color:#666; line-height:1.6; max-width:300px; }
-    .ob-dots { display:flex; justify-content:center; gap:8px; padding:20px 0; }
-    .ob-dot { width:8px; height:8px; border-radius:4px; background:#ddd; transition:all 0.3s; }
-    .ob-dot.active { background:#1a1a1a; width:24px; }
-    .ob-footer { padding:1rem 1.5rem 2rem; }
-    .ob-footer .ob-btn { background:#1a1a1a; color:#fff; border:none; width:100%; padding:16px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; }
-    .ob-skip { text-align:center; margin-top:12px; font-size:13px; color:#aaa; cursor:pointer; padding:8px; }
+    /* ── ONBOARDING ── */
+    #s-onboarding { background: #fff; }
+    .ob-wrap { flex: 1; display: flex; flex-direction: column; }
+    .ob-slides { flex: 1; position: relative; overflow: hidden; }
+    .ob-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; opacity: 0; transform: translateX(100%); transition: all 0.4s ease; }
+    .ob-slide.active { opacity: 1; transform: translateX(0); }
+    .ob-slide.prev { opacity: 0; transform: translateX(-100%); }
+    .ob-icon { font-size: 80px; margin-bottom: 24px; }
+    .ob-title { font-size: 26px; font-weight: 800; color: #1a1a1a; margin-bottom: 12px; line-height: 1.2; }
+    .ob-desc { font-size: 16px; color: #666; line-height: 1.6; max-width: 300px; }
+    .ob-dots { display: flex; justify-content: center; gap: 8px; padding: 20px 0; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 4px; background: #ddd; transition: all 0.3s; }
+    .ob-dot.active { background: #1a1a1a; width: 24px; }
+    .ob-footer { padding: 1rem 1.5rem 2rem; }
+    .ob-footer .btn-primary { background: #1a1a1a; color: #fff; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .ob-skip { text-align: center; margin-top: 12px; font-size: 13px; color: #aaa; cursor: pointer; padding: 8px; }
 
-    /* CADASTRO */
-    #s-cadastro { background:#fff; }
-    .cad-header { background:#1a1a1a; padding:3rem 1.5rem 2rem; }
-    .cad-header h2 { font-size:24px; font-weight:800; color:#fff; }
-    .cad-header p { font-size:14px; color:#aaa; margin-top:4px; }
-    .cad-body { padding:1.5rem; flex:1; overflow-y:auto; }
-    .field-group { margin-bottom:20px; }
-    .field-label { font-size:12px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
-    .field-input { width:100%; padding:14px; border:1.5px solid #eee; border-radius:12px; font-size:15px; color:#1a1a1a; background:#fafaf8; font-family:inherit; outline:none; }
-    .field-input:focus { border-color:#4f6ef7; background:#fff; }
-    .nivel-pills { display:flex; gap:8px; }
-    .nivel-pill { flex:1; padding:12px 0; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; border:1.5px solid #eee; background:#fafaf8; color:#888; text-align:center; transition:all 0.15s; }
-    .nivel-pill.selected { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
-    .field-select { width:100%; padding:14px; border:1.5px solid #eee; border-radius:12px; font-size:15px; color:#1a1a1a; background:#fafaf8; font-family:inherit; outline:none; appearance:none; }
+    /* ── CADASTRO ── */
+    #s-cadastro { background: #fff; padding: 0; }
+    .cad-header { background: #1a1a1a; padding: 3rem 1.5rem 2rem; }
+    .cad-header h2 { font-size: 24px; font-weight: 800; color: #fff; }
+    .cad-header p { font-size: 14px; color: #aaa; margin-top: 4px; }
+    .cad-body { padding: 1.5rem; flex: 1; }
+    .field-group { margin-bottom: 20px; }
+    .field-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .field-input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; }
+    .field-input:focus { border-color: #4f6ef7; background: #fff; }
+    .nivel-pills { display: flex; gap: 8px; }
+    .nivel-pill { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1.5px solid #eee; background: #fafaf8; color: #888; text-align: center; transition: all 0.15s; }
+    .nivel-pill.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .field-select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; appearance: none; }
+    .field-select:focus { border-color: #4f6ef7; }
 
-    /* HOME */
-    #s-home { background:#f5f5f0; }
-    .home-header { background:#1a1a1a; padding:3rem 1.5rem 1.5rem; }
-    .home-greet { font-size:13px; color:#888; }
-    .home-name { font-size:22px; font-weight:800; color:#fff; margin-top:2px; }
-    .home-streak { display:inline-flex; align-items:center; gap:6px; background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); border-radius:20px; padding:6px 14px; margin-top:12px; }
-    .home-streak span { font-size:14px; font-weight:700; color:#fbbf24; }
-    .home-body { padding:1.25rem; flex:1; overflow-y:auto; }
-    .home-section { font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; margin-top:20px; }
-    .home-section:first-child { margin-top:0; }
+    /* ── HOME ── */
+    #s-home { background: #f5f5f0; }
+    .home-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
+    .home-greet { font-size: 13px; color: #888; margin-bottom: 4px; }
+    .home-name { font-size: 22px; font-weight: 800; color: #fff; }
+    .home-streak { display: inline-flex; align-items: center; gap: 6px; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 20px; padding: 6px 14px; margin-top: 12px; }
+    .home-streak span { font-size: 14px; font-weight: 700; color: #fbbf24; }
+    .home-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
+    .home-section { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; margin-top: 20px; }
+    .home-section:first-child { margin-top: 0; }
 
-    /* Card artigo da semana */
-    .week-card { background:#fff; border-radius:16px; overflow:hidden; margin-bottom:16px; border:1px solid #e8e8e4; }
-    .week-card-header { background:#4f6ef7; padding:1rem 1.25rem; }
-    .week-card-header .wc-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.5px; }
-    .week-card-header .wc-title { font-size:15px; font-weight:700; color:#fff; margin-top:4px; line-height:1.4; }
-    .week-card-header .wc-authors { font-size:12px; color:rgba(255,255,255,0.65); margin-top:4px; }
-    .week-card-body { padding:1rem 1.25rem; }
-    .week-card-body .wc-resumo { font-size:13px; color:#555; line-height:1.6; margin-bottom:12px; }
-    .week-days { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
-    .week-day { flex:1; min-width:36px; padding:6px 4px; border-radius:8px; text-align:center; font-size:11px; font-weight:600; background:#f5f5f0; color:#bbb; }
-    .week-day.done { background:#4f6ef7; color:#fff; }
-    .week-day.today { background:#1a1a1a; color:#fff; }
-    .week-day.locked { background:#f5f5f0; color:#ddd; }
-    .wc-foco { font-size:12px; color:#4f6ef7; font-weight:600; background:#eef2ff; padding:6px 12px; border-radius:20px; display:inline-block; margin-bottom:12px; }
-    .scholar-link { font-size:12px; color:#4f6ef7; text-decoration:none; display:inline-flex; align-items:center; gap:4px; }
+    /* Card de sessão */
+    .session-card { background: #4f6ef7; border-radius: 16px; padding: 1.5rem; margin-bottom: 16px; cursor: pointer; transition: transform 0.15s; }
+    .session-card:active { transform: scale(0.98); }
+    .session-card h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .session-card p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+    .session-card .sc-btn { display: inline-block; background: #fff; color: #4f6ef7; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 20px; margin-top: 14px; }
 
-    /* Card nova semana */
-    .new-week-card { background:#1a1a1a; border-radius:16px; padding:1.5rem; margin-bottom:16px; cursor:pointer; }
-    .new-week-card h3 { font-size:18px; font-weight:700; color:#fff; margin-bottom:6px; }
-    .new-week-card p { font-size:13px; color:#888; line-height:1.5; }
-    .new-week-card .nwc-btn { display:inline-block; background:#4f6ef7; color:#fff; font-size:13px; font-weight:700; padding:8px 18px; border-radius:20px; margin-top:14px; }
-
-    /* Stats */
-    .stats-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-    .stat-card { background:#fff; border-radius:14px; padding:1rem; }
-    .stat-card .sc-num { font-size:28px; font-weight:800; color:#1a1a1a; }
-    .stat-card .sc-lbl { font-size:12px; color:#888; margin-top:2px; }
-    .stat-card .sc-icon { font-size:20px; margin-bottom:8px; }
+    /* Stats cards */
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 1rem; }
+    .stat-card .sc-num { font-size: 28px; font-weight: 800; color: #1a1a1a; }
+    .stat-card .sc-lbl { font-size: 12px; color: #888; margin-top: 2px; }
+    .stat-card .sc-icon { font-size: 20px; margin-bottom: 8px; }
 
     /* Calendário */
-    .cal-card { background:#fff; border-radius:14px; padding:1rem; margin-bottom:16px; }
-    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:8px; }
-    .cal-cell { aspect-ratio:1; border-radius:6px; background:#f5f5f0; }
-    .cal-cell.done { background:#4f6ef7; }
-    .cal-cell.today { background:#fbbf24; }
-    .cal-days-hdr { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
-    .cal-day-lbl { font-size:9px; color:#bbb; text-align:center; font-weight:600; }
+    .cal-card { background: #fff; border-radius: 14px; padding: 1rem; margin-bottom: 16px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
+    .cal-cell { aspect-ratio: 1; border-radius: 6px; background: #f5f5f0; }
+    .cal-cell.done { background: #4f6ef7; }
+    .cal-cell.today { background: #fbbf24; }
+    .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+    .cal-day-lbl { font-size: 9px; color: #bbb; text-align: center; font-weight: 600; }
 
     /* Badges */
-    .badges-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-    .badge-card { background:#fff; border-radius:14px; padding:14px; display:flex; align-items:center; gap:10px; }
-    .badge-card.locked { opacity:0.4; }
-    .badge-card .bi { font-size:28px; }
-    .badge-card .bt { font-size:12px; font-weight:700; color:#1a1a1a; }
-    .badge-card .bd { font-size:10px; color:#888; margin-top:2px; }
+    .badges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .badge-card { background: #fff; border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 10px; }
+    .badge-card.locked { opacity: 0.4; }
+    .badge-card .bi { font-size: 28px; }
+    .badge-card .bt { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+    .badge-card .bd { font-size: 10px; color: #888; margin-top: 2px; }
 
-    .config-card { background:#fff; border-radius:14px; padding:1rem 1.25rem; margin-bottom:10px; cursor:pointer; }
-    .config-row { display:flex; align-items:center; justify-content:space-between; }
-    .config-edit { font-size:12px; color:#bbb; }
+    /* Configuração rápida */
+    .config-card { background: #fff; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; }
+    .config-row { display: flex; align-items: center; justify-content: space-between; }
+    .config-label { font-size: 14px; color: #1a1a1a; font-weight: 500; }
+    .config-value { font-size: 14px; color: #4f6ef7; font-weight: 600; }
+    .config-edit { font-size: 12px; color: #bbb; cursor: pointer; }
 
-    /* ARTIGO DA SEMANA (tela completa) */
-    #s-artigo-semana { background:#fff; }
-    .as-header { background:#4f6ef7; padding:3rem 1.5rem 1.5rem; }
-    .as-header .as-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.5px; }
-    .as-header h2 { font-size:18px; font-weight:800; color:#fff; margin-top:6px; line-height:1.4; }
-    .as-header p { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
-    .as-body { padding:1.25rem; flex:1; overflow-y:auto; }
-    .as-section { font-size:12px; font-weight:700; color:#4f6ef7; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:20px; }
-    .as-section:first-child { margin-top:0; }
-    .as-text { font-size:14px; color:#444; line-height:1.7; }
-    .as-resumo-card { background:#f8f9ff; border:1px solid #e0e7ff; border-radius:12px; padding:1rem; margin-bottom:16px; }
-    .as-pontos { list-style:none; }
-    .as-pontos li { font-size:14px; color:#444; line-height:1.6; padding:6px 0; border-bottom:1px solid #f5f5f0; display:flex; gap:8px; }
-    .as-pontos li:last-child { border-bottom:none; }
-    .as-pontos li::before { content:'→'; color:#4f6ef7; font-weight:700; flex-shrink:0; }
-    .scholar-btn-full { display:flex; align-items:center; justify-content:center; gap:8px; background:#eef2ff; color:#4f6ef7; font-size:14px; font-weight:700; padding:14px; border-radius:12px; text-decoration:none; margin:16px 0; }
+    /* ── ARTIGO ── */
+    #s-artigo { background: #fff; }
+    .art-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
+    .art-header h2 { font-size: 20px; font-weight: 700; color: #fff; }
+    .art-header p { font-size: 13px; color: #888; margin-top: 4px; }
+    .art-body { padding: 1.25rem; flex: 1; }
+    .art-card { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1.25rem; margin-bottom: 16px; }
+    .art-tag { display: inline-block; background: #eef2ff; color: #4f6ef7; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .art-title { font-size: 15px; font-weight: 700; color: #1a1a1a; line-height: 1.45; margin-bottom: 8px; }
+    .art-meta { font-size: 13px; color: #666; line-height: 1.5; }
+    .art-query { font-size: 12px; color: #4f6ef7; margin-top: 8px; }
+    .scholar-btn { display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; color: #4f6ef7; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 20px; text-decoration: none; margin-top: 12px; }
+    .info-pill { display: inline-block; background: #f0fdf4; color: #16a34a; font-size: 12px; font-weight: 500; padding: 8px 14px; border-radius: 20px; margin-bottom: 16px; border: 1px solid #bbf7d0; }
 
-    /* LOADING */
-    #s-loading { background:#fff; align-items:center; justify-content:center; }
-    .loading-inner { text-align:center; padding:2rem; }
-    .spinner { width:40px; height:40px; border:3px solid #eee; border-top-color:#4f6ef7; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
-    .loading-msg { font-size:15px; color:#888; }
+    /* ── BOTÕES GERAIS ── */
+    .btn { width: 100%; padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 10px; transition: transform 0.1s; border: none; }
+    .btn:active { transform: scale(0.98); }
+    .btn-dark { background: #1a1a1a; color: #fff; }
+    .btn-dark:hover { background: #333; }
+    .btn-ghost { background: transparent; color: #888; border: 1.5px solid #eee; }
 
-    /* PERGUNTAS */
-    #s-perguntas { background:#fff; padding:1.25rem; }
-    .q-progress { height:5px; background:#f0f0f0; border-radius:3px; margin-bottom:24px; overflow:hidden; }
-    .q-progress-fill { height:100%; background:#4f6ef7; border-radius:3px; transition:width 0.4s ease; }
-    .q-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .q-num { font-size:12px; font-weight:600; color:#999; text-transform:uppercase; letter-spacing:0.5px; }
-    .q-foco { font-size:11px; color:#4f6ef7; font-weight:600; background:#eef2ff; padding:3px 8px; border-radius:6px; }
-    .q-text { font-size:17px; font-weight:700; color:#1a1a1a; line-height:1.5; margin-bottom:20px; }
-    .option { display:block; width:100%; text-align:left; padding:14px 16px; background:#fafaf8; border:1.5px solid #e8e8e4; border-radius:12px; font-size:14px; color:#1a1a1a; cursor:pointer; margin-bottom:10px; font-family:inherit; transition:all 0.15s; line-height:1.4; }
-    .option:hover { background:#f0f0f0; border-color:#ccc; }
-    .option.correct { background:#f0fdf4; border-color:#86efac; color:#15803d; animation:bounce 0.3s ease; }
-    .option.wrong { background:#fff1f2; border-color:#fca5a5; color:#dc2626; animation:shake 0.3s ease; }
-    .expl { font-size:13px; color:#555; background:#f8f9ff; border:1px solid #e0e7ff; border-radius:10px; padding:12px 14px; margin-top:10px; line-height:1.55; }
-    .expl::before { content:'💡 '; }
+    /* ── LOADING ── */
+    #s-loading { background: #fff; align-items: center; justify-content: center; }
+    .loading-inner { text-align: center; padding: 2rem; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top-color: #4f6ef7; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    .loading-msg { font-size: 15px; color: #888; }
 
-    /* RESULTADO */
-    #s-resultado { background:#f5f5f0; align-items:center; justify-content:flex-start; padding:2rem 1.5rem; }
-    .res-top { text-align:center; width:100%; padding:1rem 0; }
-    .res-icon { font-size:72px; animation:pop 0.4s ease; margin-bottom:8px; }
-    .res-score { font-size:52px; font-weight:800; color:#1a1a1a; }
-    .res-sub { font-size:14px; color:#888; margin-top:4px; margin-bottom:16px; }
-    .res-dia { background:#eef2ff; border-radius:12px; padding:10px 16px; text-align:center; margin-bottom:16px; width:100%; }
-    .res-dia span { font-size:13px; color:#4f6ef7; font-weight:600; }
-    .new-badge-card { background:#fef3c7; border:1.5px solid #fbbf24; border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; width:100%; display:none; animation:pop 0.4s ease; }
-    .nb-icon { font-size:36px; }
-    .nb-title { font-size:15px; font-weight:700; color:#92400e; margin-top:6px; }
-    .nb-desc { font-size:12px; color:#b45309; }
-    .res-feedback { background:#fff; border-radius:16px; padding:1.25rem; font-size:14px; color:#555; line-height:1.65; width:100%; margin-bottom:16px; }
-    .res-btns { width:100%; }
+    /* ── PERGUNTAS ── */
+    #s-perguntas { background: #fff; padding: 1.25rem; }
+    .q-progress { height: 5px; background: #f0f0f0; border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+    .q-progress-fill { height: 100%; background: #4f6ef7; border-radius: 3px; transition: width 0.4s ease; }
+    .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .q-num { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+    .q-nivel { font-size: 11px; color: #4f6ef7; font-weight: 600; background: #eef2ff; padding: 3px 8px; border-radius: 6px; }
+    .q-text { font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.5; margin-bottom: 20px; }
+    .option { display: block; width: 100%; text-align: left; padding: 14px 16px; background: #fafaf8; border: 1.5px solid #e8e8e4; border-radius: 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: all 0.15s; line-height: 1.4; }
+    .option:hover { background: #f0f0f0; border-color: #ccc; }
+    .option.correct { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+    .option.wrong { background: #fff1f2; border-color: #fca5a5; color: #dc2626; }
+    .expl { font-size: 13px; color: #555; background: #f8f9ff; border: 1px solid #e0e7ff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; line-height: 1.55; }
+    .expl::before { content: '💡 '; }
 
-    /* ERRO */
-    #s-erro { background:#fff; align-items:center; justify-content:center; padding:2rem; text-align:center; }
-    .erro-icon { font-size:56px; margin-bottom:16px; }
-    .erro-title { font-size:20px; font-weight:700; color:#1a1a1a; margin-bottom:8px; }
-    .erro-desc { font-size:14px; color:#888; line-height:1.6; margin-bottom:24px; }
+    /* ── RESULTADO ── */
+    #s-resultado { background: #f5f5f0; align-items: center; justify-content: flex-start; padding: 2rem 1.5rem; }
+    .res-top { text-align: center; width: 100%; padding: 1rem 0; }
+    .res-icon { font-size: 72px; animation: pop 0.4s ease; margin-bottom: 8px; }
+    .res-score { font-size: 52px; font-weight: 800; color: #1a1a1a; }
+    .res-sub { font-size: 14px; color: #888; margin-top: 4px; margin-bottom: 24px; }
+    .new-badge-card { background: #fef3c7; border: 1.5px solid #fbbf24; border-radius: 16px; padding: 16px; margin-bottom: 16px; text-align: center; width: 100%; display: none; animation: pop 0.4s ease; }
+    .nb-icon { font-size: 36px; }
+    .nb-title { font-size: 15px; font-weight: 700; color: #92400e; margin-top: 6px; }
+    .nb-desc { font-size: 12px; color: #b45309; }
+    .res-feedback { background: #fff; border-radius: 16px; padding: 1.25rem; font-size: 14px; color: #555; line-height: 1.65; width: 100%; margin-bottom: 16px; }
+    .res-btns { width: 100%; }
 
-    .btn { width:100%; padding:16px; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:10px; transition:transform 0.1s; border:none; }
-    .btn:active { transform:scale(0.98); }
-    .btn-dark { background:#1a1a1a; color:#fff; }
-    .btn-blue { background:#4f6ef7; color:#fff; }
-    .btn-ghost { background:transparent; color:#888; border:1.5px solid #eee; }
-    .footer { text-align:center; font-size:11px; color:#ccc; padding:16px 0 8px; }
-    .err { color:#dc2626; font-size:13px; text-align:center; margin-top:10px; }
+    .footer { text-align: center; font-size: 11px; color: #ccc; padding: 16px 0 8px; }
+    .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; }
+
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+    .option.correct { animation: bounce 0.3s ease; }
+    .option.wrong { animation: shake 0.3s ease; }
+
+    .studied-banner { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .studied-banner .sb-icon { font-size: 28px; }
+    .studied-banner .sb-text { font-size: 14px; font-weight: 600; color: #15803d; }
+    .studied-banner .sb-sub { font-size: 12px; color: #16a34a; margin-top: 2px; }
+
+    .session-card.done { background: #e8e8e4; cursor: default; }
+    .session-card.done .sc-btn { background: #ccc; color: #888; }
+
+    #s-erro { background: #fff; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+    .erro-icon { font-size: 56px; margin-bottom: 16px; }
+    .erro-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .erro-desc { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 24px; }
+
+    #s-perfil { background: #f5f5f0; }
+    .perfil-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; display: flex; align-items: center; gap: 14px; }
+    .perfil-avatar { width: 52px; height: 52px; background: #4f6ef7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .perfil-info h2 { font-size: 20px; font-weight: 800; color: #fff; }
+    .perfil-info p { font-size: 13px; color: #888; margin-top: 2px; }
+    .perfil-body { padding: 1.25rem; }
+    .perfil-card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 12px; }
+    .perfil-card h3 { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .perfil-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f0; }
+    .perfil-row:last-child { border-bottom: none; }
+    .perfil-row .pr-label { font-size: 14px; color: #888; }
+    .perfil-row .pr-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
   </style>
 </head>
 <body>
@@ -205,18 +215,18 @@
       <div class="ob-slides">
         <div class="ob-slide active" id="ob0">
           <div class="ob-icon">📰</div>
-          <h2 class="ob-title">Um artigo por semana</h2>
-          <p class="ob-desc">A IA seleciona um artigo científico real baseado no seu projeto. Você tem a semana toda para estudá-lo.</p>
+          <h2 class="ob-title">Um artigo por dia</h2>
+          <p class="ob-desc">A IA seleciona artigos científicos reais baseados no seu projeto de pesquisa e nível acadêmico.</p>
         </div>
         <div class="ob-slide" id="ob1">
           <div class="ob-icon">🧠</div>
-          <h2 class="ob-title">Perguntas todo dia</h2>
-          <p class="ob-desc">Cada dia da semana tem um foco diferente — introdução, metodologia, resultados, síntese — aprofundando seu entendimento.</p>
+          <h2 class="ob-title">Perguntas no seu nível</h2>
+          <p class="ob-desc">Questões adaptadas para IC, Mestrado ou Doutorado — do básico à análise crítica avançada.</p>
         </div>
         <div class="ob-slide" id="ob2">
           <div class="ob-icon">🔥</div>
-          <h2 class="ob-title">Construa expertise</h2>
-          <p class="ob-desc">Mantenha seu streak, conquiste badges e ao fim de cada semana você realmente domina o artigo estudado.</p>
+          <h2 class="ob-title">Construa seu streak</h2>
+          <p class="ob-desc">Estude todo dia, mantenha sua sequência e conquiste badges. A consistência é o que forma pesquisadores.</p>
         </div>
       </div>
       <div class="ob-dots">
@@ -225,7 +235,7 @@
         <div class="ob-dot" id="dot2"></div>
       </div>
       <div class="ob-footer">
-        <button class="ob-btn" id="ob-btn" onclick="obNext()">Próximo →</button>
+        <button class="btn-primary" id="ob-btn" onclick="obNext()">Próximo →</button>
         <div class="ob-skip" onclick="irCadastro()">Pular</div>
       </div>
     </div>
@@ -245,9 +255,9 @@
       <div class="field-group">
         <div class="field-label">Nível acadêmico</div>
         <div class="nivel-pills">
-          <button class="nivel-pill selected" onclick="selecionarNivel('IC',this)">IC</button>
-          <button class="nivel-pill" onclick="selecionarNivel('Mestrado',this)">Mestrado</button>
-          <button class="nivel-pill" onclick="selecionarNivel('Doutorado',this)">Doutorado</button>
+          <button class="nivel-pill selected" onclick="selecionarNivel('IC', this)">IC</button>
+          <button class="nivel-pill" onclick="selecionarNivel('Mestrado', this)">Mestrado</button>
+          <button class="nivel-pill" onclick="selecionarNivel('Doutorado', this)">Doutorado</button>
         </div>
       </div>
       <div class="field-group">
@@ -284,20 +294,51 @@
     </div>
     <div class="home-body">
 
-      <div class="home-section">Artigo desta semana</div>
-      <div id="home-artigo-container"></div>
-
-      <div class="home-section">Seu progresso</div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="sc-icon">📚</div><div class="sc-num" id="h-sessoes">0</div><div class="sc-lbl">sessões completadas</div></div>
-        <div class="stat-card"><div class="sc-icon">🎯</div><div class="sc-num" id="h-pct">0%</div><div class="sc-lbl">aproveitamento</div></div>
-        <div class="stat-card"><div class="sc-icon">✅</div><div class="sc-num" id="h-acertos">0</div><div class="sc-lbl">respostas certas</div></div>
-        <div class="stat-card"><div class="sc-icon">⚡</div><div class="sc-num" id="h-maior">0</div><div class="sc-lbl">maior sequência</div></div>
+      <!-- Banner já estudou hoje -->
+      <div class="studied-banner" id="studied-banner" style="display:none;">
+        <div class="sb-icon">✅</div>
+        <div>
+          <div class="sb-text">Sessão de hoje concluída!</div>
+          <div class="sb-sub" id="studied-sub">Volte amanhã para manter seu streak.</div>
+        </div>
       </div>
 
+      <!-- Botão iniciar sessão -->
+      <div class="session-card" id="session-card" onclick="iniciarSessao()">
+        <h3>Sessão de hoje</h3>
+        <p id="home-sessao-desc">A IA vai sugerir um artigo baseado no seu projeto e gerar perguntas personalizadas.</p>
+        <div class="sc-btn" id="session-btn">Iniciar agora →</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="home-section">Seu progresso</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="sc-icon">📚</div>
+          <div class="sc-num" id="h-sessoes">0</div>
+          <div class="sc-lbl">sessões completadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">🎯</div>
+          <div class="sc-num" id="h-pct">0%</div>
+          <div class="sc-lbl">de aproveitamento</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">✅</div>
+          <div class="sc-num" id="h-acertos">0</div>
+          <div class="sc-lbl">respostas certas</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-icon">⚡</div>
+          <div class="sc-num" id="h-maior">0</div>
+          <div class="sc-lbl">maior sequência</div>
+        </div>
+      </div>
+
+      <!-- Calendário -->
       <div class="home-section">Histórico de estudos</div>
       <div class="cal-card">
-        <div class="cal-days-hdr">
+        <div class="cal-days-header">
           <div class="cal-day-lbl">D</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div>
           <div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div>
           <div class="cal-day-lbl">S</div>
@@ -305,43 +346,58 @@
         <div class="cal-grid" id="h-calendar"></div>
       </div>
 
+      <!-- Badges -->
       <div class="home-section">Conquistas</div>
       <div class="badges-grid" id="h-badges"></div>
 
+      <!-- Config -->
       <div class="home-section">Configurações</div>
-      <div class="config-card" onclick="irCadastro()">
+      <div class="config-card" onclick="irPerfil()">
         <div class="config-row">
           <div>
-            <div style="font-size:14px;font-weight:600;color:#1a1a1a;" id="cfg-nivel">IC</div>
+            <div class="config-label" id="cfg-nivel">IC</div>
             <div style="font-size:11px;color:#aaa;" id="cfg-area">Ciência dos Materiais</div>
           </div>
-          <div class="config-edit">Editar perfil →</div>
+          <div class="config-edit">Ver perfil →</div>
         </div>
       </div>
 
-      <div class="footer">CientistaDiário · v0.3</div>
+      <div class="footer">CientistaDiário · v0.2</div>
     </div>
   </div>
 
-  <!-- ARTIGO DA SEMANA (tela completa) -->
-  <div class="screen" id="s-artigo-semana">
-    <div class="as-header">
-      <div class="as-label" id="as-label">Artigo da semana</div>
-      <h2 id="as-titulo">—</h2>
-      <p id="as-autores">—</p>
-    </div>
-    <div class="as-body">
-      <div class="as-section">Resumo</div>
-      <div class="as-resumo-card">
-        <div class="as-text" id="as-resumo">—</div>
+  <!-- ERRO -->
+  <div class="screen" id="s-erro">
+    <div class="erro-icon" id="erro-icon">😕</div>
+    <div class="erro-title" id="erro-title">Algo deu errado</div>
+    <div class="erro-desc" id="erro-desc">Não foi possível conectar com a IA. Verifique sua internet e tente novamente.</div>
+    <button class="btn btn-dark" id="erro-btn" onclick="erroTentar()">Tentar novamente →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="show('s-home')">Voltar ao início</button>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="screen" id="s-perfil">
+    <div class="perfil-header">
+      <div class="perfil-avatar" id="perf-avatar">?</div>
+      <div class="perfil-info">
+        <h2 id="perf-nome">—</h2>
+        <p id="perf-nivel-area">—</p>
       </div>
-      <div class="as-section">Pontos-chave</div>
-      <ul class="as-pontos" id="as-pontos"></ul>
-      <a id="as-scholar" href="#" target="_blank" class="scholar-btn-full">🎓 Acessar artigo no Google Acadêmico</a>
-      <div class="as-section">Progresso da semana</div>
-      <div class="week-days" id="as-week-days" style="margin-bottom:16px;"></div>
-      <div class="wc-foco" id="as-foco-badge">Foco de hoje</div>
-      <button class="btn btn-blue" onclick="iniciarSessaoDia()" id="as-btn-sessao">Iniciar sessão de hoje →</button>
+    </div>
+    <div class="perfil-body">
+      <div class="perfil-card">
+        <h3>Estatísticas</h3>
+        <div class="perfil-row"><span class="pr-label">Sessões completadas</span><span class="pr-value" id="perf-sessoes">0</span></div>
+        <div class="perfil-row"><span class="pr-label">Respostas certas</span><span class="pr-value" id="perf-acertos">0</span></div>
+        <div class="perfil-row"><span class="pr-label">Aproveitamento</span><span class="pr-value" id="perf-pct">0%</span></div>
+        <div class="perfil-row"><span class="pr-label">Maior sequência</span><span class="pr-value" id="perf-maior">0 dias</span></div>
+        <div class="perfil-row"><span class="pr-label">Badges conquistados</span><span class="pr-value" id="perf-badges">0</span></div>
+      </div>
+      <div class="perfil-card">
+        <h3>Projeto de pesquisa</h3>
+        <div style="font-size:14px;color:#555;line-height:1.6;" id="perf-projeto">—</div>
+      </div>
+      <button class="btn btn-dark" onclick="irEditarPerfil()">Editar perfil →</button>
       <button class="btn btn-ghost" onclick="show('s-home')">Voltar</button>
     </div>
   </div>
@@ -354,12 +410,32 @@
     </div>
   </div>
 
+  <!-- ARTIGO -->
+  <div class="screen" id="s-artigo">
+    <div class="art-header">
+      <h2>Artigo de hoje</h2>
+      <p id="art-nivel-area">—</p>
+    </div>
+    <div class="art-body">
+      <div class="art-card">
+        <span class="art-tag" id="art-tag">—</span>
+        <p class="art-title" id="art-titulo">—</p>
+        <p class="art-meta" id="art-meta">—</p>
+        <p class="art-query" id="art-query" style="display:none;"></p>
+        <a id="art-scholar" href="#" target="_blank" class="scholar-btn">🎓 Buscar no Google Acadêmico</a>
+      </div>
+      <div class="info-pill">📖 Leia o artigo antes de continuar</div>
+      <button class="btn btn-dark" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
+      <button class="btn btn-ghost" onclick="show('s-home')">Voltar ao início</button>
+    </div>
+  </div>
+
   <!-- PERGUNTAS -->
   <div class="screen" id="s-perguntas">
     <div class="q-progress"><div class="q-progress-fill" id="prog" style="width:0%"></div></div>
     <div class="q-header">
       <span class="q-num" id="q-num">Pergunta 1 de 4</span>
-      <span class="q-foco" id="q-foco">Introdução</span>
+      <span class="q-nivel" id="q-nivel">IC</span>
     </div>
     <div class="q-text" id="q-text"></div>
     <div id="opts"></div>
@@ -374,7 +450,6 @@
       <div class="res-score" id="res-score">0/4</div>
       <div class="res-sub">perguntas certas</div>
     </div>
-    <div class="res-dia"><span id="res-dia-txt">Dia 1 de 7 concluído</span></div>
     <div class="new-badge-card" id="new-badge">
       <div class="nb-icon" id="nb-icon">🏅</div>
       <div class="nb-title" id="nb-title">Badge conquistado!</div>
@@ -386,45 +461,28 @@
     </div>
   </div>
 
-  <!-- ERRO -->
-  <div class="screen" id="s-erro">
-    <div class="erro-icon">😕</div>
-    <div class="erro-title" id="erro-title">Algo deu errado</div>
-    <div class="erro-desc" id="erro-desc">Não foi possível conectar com a IA.</div>
-    <button class="btn btn-dark" onclick="erroTentar()">Tentar novamente →</button>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="show('s-home')">Voltar ao início</button>
-  </div>
-
 </div>
+
 <script>
 const API_KEY = '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';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-const FOCOS = [
-  'Contexto e Introdução',
-  'Objetivos e Hipóteses',
-  'Metodologia',
-  'Resultados',
-  'Discussão',
-  'Limitações e Trabalhos Futuros',
-  'Síntese e Conexão com sua Pesquisa'
-];
-
+// ── BADGES ────────────────────────────────────────────────
 const BADGES_DEF = [
-  { id:'first',    icon:'🌱', title:'Primeiro passo',    desc:'Completou a primeira sessão',      cond:p=>p.sessoes>=1 },
-  { id:'streak3',  icon:'🔥', title:'3 dias seguidos',   desc:'3 dias de sequência',              cond:p=>p.streakAtual>=3 },
-  { id:'streak7',  icon:'⚡', title:'Uma semana!',       desc:'7 dias de sequência',              cond:p=>p.streakAtual>=7 },
-  { id:'streak30', icon:'🏆', title:'Mês científico',    desc:'30 dias de sequência',             cond:p=>p.streakAtual>=30 },
-  { id:'semana1',  icon:'📰', title:'Primeira semana',   desc:'Completou uma semana de estudos',  cond:p=>p.semanasCompletas>=1 },
-  { id:'acc10',    icon:'🎯', title:'10 acertos',        desc:'Acumulou 10 respostas certas',     cond:p=>p.totalAcertos>=10 },
-  { id:'acc50',    icon:'💡', title:'50 acertos',        desc:'Acumulou 50 respostas certas',     cond:p=>p.totalAcertos>=50 },
-  { id:'perfect',  icon:'⭐', title:'Sessão perfeita',   desc:'Acertou tudo em uma sessão',       cond:p=>p.sessoesPerfei>=1 },
+  { id:'first',    icon:'🌱', title:'Primeiro passo',  desc:'Completou a primeira sessão',    cond:p=>p.sessoes>=1 },
+  { id:'streak3',  icon:'🔥', title:'3 dias seguidos', desc:'3 dias de sequência',             cond:p=>p.streakAtual>=3 },
+  { id:'streak7',  icon:'⚡', title:'Uma semana!',     desc:'7 dias de sequência',             cond:p=>p.streakAtual>=7 },
+  { id:'streak30', icon:'🏆', title:'Mês científico',  desc:'30 dias de sequência',            cond:p=>p.streakAtual>=30 },
+  { id:'acc10',    icon:'🎯', title:'10 acertos',      desc:'Acumulou 10 respostas certas',    cond:p=>p.totalAcertos>=10 },
+  { id:'acc50',    icon:'💡', title:'50 acertos',      desc:'Acumulou 50 respostas certas',    cond:p=>p.totalAcertos>=50 },
+  { id:'perfect',  icon:'⭐', title:'Sessão perfeita', desc:'Acertou tudo em uma sessão',      cond:p=>p.sessoesPerfei>=1 },
+  { id:'sess10',   icon:'📚', title:'10 sessões',      desc:'Completou 10 sessões de estudo',  cond:p=>p.sessoes>=10 },
 ];
 
 // ── STORAGE ───────────────────────────────────────────────
 function loadProgress() {
   try { const r=localStorage.getItem('cd_progress'); if(r) return JSON.parse(r); } catch(e){}
-  return {sessoes:0,totalAcertos:0,totalPerguntas:0,streakAtual:0,maiorStreak:0,badges:[],sessoesPerfei:0,dias:[],semanasCompletas:0};
+  return {sessoes:0,totalAcertos:0,totalPerguntas:0,streakAtual:0,maiorStreak:0,badges:[],sessoesPerfei:0,dias:[]};
 }
 function saveProgress(p) { localStorage.setItem('cd_progress',JSON.stringify(p)); }
 function loadPerfil() {
@@ -432,15 +490,7 @@ function loadPerfil() {
   return null;
 }
 function savePerfil(p) { localStorage.setItem('cd_perfil',JSON.stringify(p)); }
-function loadSemana() {
-  try { const r=localStorage.getItem('cd_semana'); if(r) return JSON.parse(r); } catch(e){}
-  return null;
-}
-function saveSemana(s) { localStorage.setItem('cd_semana',JSON.stringify(s)); }
 function hoje() { return new Date().toISOString().slice(0,10); }
-function inicioSemana() {
-  const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d.toISOString().slice(0,10);
-}
 
 function atualizarStreak(p) {
   const d=hoje();
@@ -448,53 +498,39 @@ function atualizarStreak(p) {
   p.dias.push(d);
   if(p.dias.length>60) p.dias=p.dias.slice(-60);
   const ontem=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  p.streakAtual=p.dias.includes(ontem)?p.streakAtual+1:1;
+  p.streakAtual = p.dias.includes(ontem) ? p.streakAtual+1 : 1;
   if(p.streakAtual>p.maiorStreak) p.maiorStreak=p.streakAtual;
 }
 function checarBadges(p) {
   const novos=[];
-  for(const b of BADGES_DEF){if(!p.badges.includes(b.id)&&b.cond(p)){p.badges.push(b.id);novos.push(b);}}
+  for(const b of BADGES_DEF) { if(!p.badges.includes(b.id)&&b.cond(p)){p.badges.push(b.id);novos.push(b);} }
   return novos;
-}
-
-// ── SEMANA ────────────────────────────────────────────────
-function diaAtualSemana() {
-  // 0=dom,1=seg...6=sab → mapeamos para dia de estudo 1-7
-  const dow = new Date().getDay();
-  return dow === 0 ? 7 : dow; // seg=1...sab=6, dom=7
-}
-
-function semanaAtual(semana) {
-  if(!semana) return false;
-  return semana.inicioSemana === inicioSemana();
-}
-
-function diaJaEstudado(semana) {
-  if(!semana) return false;
-  return semana.diasEstudados && semana.diasEstudados.includes(hoje());
 }
 
 // ── RENDER HOME ───────────────────────────────────────────
 function renderHome() {
-  const p=loadProgress(), perf=loadPerfil(), semana=loadSemana();
-  if(perf){
-    document.getElementById('home-nome').textContent=perf.nome||'Pesquisador';
-    document.getElementById('cfg-nivel').textContent=perf.nivel||'IC';
-    document.getElementById('cfg-area').textContent=perf.areaNome||'';
+  const p=loadProgress(), perf=loadPerfil();
+  if(perf) {
+    document.getElementById('home-nome').textContent = perf.nome || 'Pesquisador';
+    document.getElementById('cfg-nivel').textContent = perf.nivel || 'IC';
+    document.getElementById('cfg-area').textContent = perf.areaNome || '';
+    document.getElementById('home-sessao-desc').textContent = perf.projeto ? '"' + perf.projeto.substring(0,80) + (perf.projeto.length>80?'…':'') + '"' : 'A IA vai sugerir um artigo baseado no seu projeto.';
   }
-  document.getElementById('home-streak-num').textContent=p.streakAtual+'🔥';
-  document.getElementById('home-streak-lbl').textContent=p.streakAtual===1?'dia de sequência':'dias de sequência';
-  document.getElementById('h-sessoes').textContent=p.sessoes;
+  document.getElementById('home-streak-num').textContent = p.streakAtual+'🔥';
+  document.getElementById('home-streak-lbl').textContent = p.streakAtual===1?'dia de sequência':'dias de sequência';
+  document.getElementById('h-sessoes').textContent = p.sessoes;
   const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
-  document.getElementById('h-pct').textContent=pct+'%';
-  document.getElementById('h-acertos').textContent=p.totalAcertos;
-  document.getElementById('h-maior').textContent=p.maiorStreak;
+  document.getElementById('h-pct').textContent = pct+'%';
+  document.getElementById('h-acertos').textContent = p.totalAcertos;
+  document.getElementById('h-maior').textContent = p.maiorStreak;
 
-  // Calendário
+  // calendário
   const cal=document.getElementById('h-calendar'); cal.innerHTML='';
-  const todayStr=hoje();
-  const startDate=new Date(); startDate.setDate(startDate.getDate()-27);
-  for(let i=0;i<startDate.getDay();i++){cal.appendChild(document.createElement('div'));}
+  // alinhar com dia da semana
+  const todayDate=new Date(); const todayStr=hoje();
+  const startDate=new Date(todayDate); startDate.setDate(startDate.getDate()-27);
+  const startDow=startDate.getDay(); // 0=dom
+  for(let i=0;i<startDow;i++){const e=document.createElement('div');cal.appendChild(e);}
   for(let i=27;i>=0;i--){
     const d=new Date(Date.now()-i*86400000).toISOString().slice(0,10);
     const el=document.createElement('div');
@@ -502,7 +538,7 @@ function renderHome() {
     cal.appendChild(el);
   }
 
-  // Badges
+  // badges
   const bg=document.getElementById('h-badges'); bg.innerHTML='';
   for(const b of BADGES_DEF){
     const el=document.createElement('div');
@@ -511,184 +547,149 @@ function renderHome() {
     bg.appendChild(el);
   }
 
-  // Card artigo da semana
-  const container=document.getElementById('home-artigo-container');
-  container.innerHTML='';
-  if(semanaAtual(semana) && semana.artigo) {
-    const diaNum=diaAtualSemana();
-    const jaEstudou=diaJaEstudado(semana);
-    const foco=FOCOS[Math.min(diaNum-1,6)];
-    const diasHtml=FOCOS.map((_,i)=>{
-      const dNum=i+1;
-      const estCls=semana.diasEstudados&&semana.diasEstudados.some(d=>{
-        const wd=new Date(d).getDay(); return (wd===0?7:wd)===dNum;
-      })?'done':dNum<diaNum?'locked':dNum===diaNum?'today':'locked';
-      return '<div class="week-day '+estCls+'">D'+dNum+'</div>';
-    }).join('');
-    container.innerHTML=`
-      <div class="week-card" onclick="verArtigoSemana()">
-        <div class="week-card-header">
-          <div class="wc-label">Semana atual · Dia ${diaNum} de 7</div>
-          <div class="wc-title">${semana.artigo.titulo}</div>
-          <div class="wc-authors">${semana.artigo.autores}</div>
-        </div>
-        <div class="week-card-body">
-          <div class="week-days">${diasHtml}</div>
-          <div class="wc-foco">📌 Foco de hoje: ${foco}</div>
-          <a href="https://scholar.google.com/scholar?q=${encodeURIComponent(semana.artigo.query_scholar||semana.artigo.titulo)}&hl=pt-BR" target="_blank" class="scholar-link">🎓 Buscar no Google Acadêmico</a>
-        </div>
-      </div>
-      ${jaEstudou
-        ? '<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;margin-bottom:16px;"><div style="font-size:28px;">✅</div><div><div style="font-size:14px;font-weight:600;color:#15803d;">Sessão de hoje concluída!</div><div style="font-size:12px;color:#16a34a;margin-top:2px;">Streak: '+p.streakAtual+'🔥 — volte amanhã!</div></div></div>'
-        : '<button class="btn btn-blue" onclick="verArtigoSemana()" style="margin-bottom:16px;">Ver artigo e iniciar sessão →</button>'
-      }`;
+  // Banner já estudou hoje
+  const jaEstudou=p.dias.includes(hoje());
+  const banner=document.getElementById('studied-banner');
+  const card=document.getElementById('session-card');
+  const btn=document.getElementById('session-btn');
+  if(jaEstudou){
+    banner.style.display='flex';
+    document.getElementById('studied-sub').textContent='Streak atual: '+p.streakAtual+'🔥 — volte amanhã!';
+    card.classList.add('done');
+    card.onclick=null;
+    btn.textContent='Concluído hoje ✓';
   } else {
-    container.innerHTML=`
-      <div class="new-week-card" onclick="gerarArtigoSemana()">
-        <h3>🗓 Nova semana de estudos</h3>
-        <p>A IA vai selecionar um artigo científico real baseado no seu projeto para você estudar durante toda a semana.</p>
-        <div class="nwc-btn">Gerar artigo da semana →</div>
-      </div>`;
+    banner.style.display='none';
+    card.classList.remove('done');
+    card.onclick=iniciarSessao;
+    btn.textContent='Iniciar agora →';
   }
 }
 
 // ── ONBOARDING ────────────────────────────────────────────
 let obSlide=0;
 function obNext() {
-  if(obSlide<2){
-    document.getElementById('ob'+obSlide).classList.replace('active','prev');
+  if(obSlide<2) {
+    document.getElementById('ob'+obSlide).classList.remove('active');
+    document.getElementById('ob'+obSlide).classList.add('prev');
     document.getElementById('dot'+obSlide).classList.remove('active');
     obSlide++;
     document.getElementById('ob'+obSlide).classList.add('active');
     document.getElementById('dot'+obSlide).classList.add('active');
     if(obSlide===2) document.getElementById('ob-btn').textContent='Começar →';
-  } else { irCadastro(); }
+  } else {
+    irCadastro();
+  }
 }
 function irCadastro() { show('s-cadastro'); }
 
 // ── CADASTRO ──────────────────────────────────────────────
 let nivelAtual='IC';
-function selecionarNivel(nivel,el){
+function selecionarNivel(nivel,el) {
   nivelAtual=nivel;
   document.querySelectorAll('.nivel-pill').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
 }
-function salvarCadastro(){
+
+function salvarCadastro() {
   const nome=document.getElementById('cad-nome').value.trim();
   if(!nome){document.getElementById('err-cad').textContent='Digite seu nome para continuar.';return;}
   const areaEl=document.getElementById('cad-area');
-  savePerfil({nome,nivel:nivelAtual,area:areaEl.value,areaNome:areaEl.options[areaEl.selectedIndex].text,projeto:document.getElementById('cad-projeto').value.trim()});
+  const areaNome=areaEl.options[areaEl.selectedIndex].text;
+  const projeto=document.getElementById('cad-projeto').value.trim();
+  savePerfil({nome, nivel:nivelAtual, area:areaEl.value, areaNome, projeto});
   localStorage.setItem('cd_onboarding','done');
-  renderHome(); show('s-home');
+  renderHome();
+  show('s-home');
+}
+
+function irEditarPerfil() {
+  const perf=loadPerfil();
+  if(perf){
+    document.getElementById('cad-nome').value=perf.nome||'';
+    document.getElementById('cad-area').value=perf.area||'materiais';
+    document.getElementById('cad-projeto').value=perf.projeto||'';
+    nivelAtual=perf.nivel||'IC';
+    document.querySelectorAll('.nivel-pill').forEach(p=>{
+      p.classList.toggle('selected', p.textContent===nivelAtual);
+    });
+  }
+  show('s-cadastro');
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────
-function show(id){
+function show(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
-function setLoading(msg){document.getElementById('loading-msg').textContent=msg;show('s-loading');}
-
-// ── ERRO ──────────────────────────────────────────────────
-let erroCallback=null;
-function mostrarErro(titulo,desc,cb){
-  document.getElementById('erro-title').textContent=titulo;
-  document.getElementById('erro-desc').textContent=desc;
-  erroCallback=cb; show('s-erro');
-}
-function erroTentar(){if(erroCallback)erroCallback();}
+function setLoading(msg) { document.getElementById('loading-msg').textContent=msg; show('s-loading'); }
 
 // ── IA ────────────────────────────────────────────────────
-async function chamarIA(prompt){
+async function chamarIA(prompt) {
   const resp=await fetch(API_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY,'HTTP-Referer':window.location.href},
-    body:JSON.stringify({model:'meta-llama/llama-3.1-8b-instruct:free',messages:[{role:'user',content:prompt}],max_tokens:1400})
+    body:JSON.stringify({model:'openrouter/auto',messages:[{role:'user',content:prompt}],max_tokens:1200})
   });
   if(!resp.ok) throw new Error('Erro na API: '+resp.status);
   const data=await resp.json();
   return data.choices[0].message.content;
 }
-function parseJSON(txt){
-  const clean=txt.replace(/```json|```/g,'').trim();
-  const match=clean.match(/[\[{][\s\S]*[\]}]/);
-  let parsed=null;
-  try{parsed=JSON.parse(clean);}catch(e){}
-  if(!parsed&&match){try{parsed=JSON.parse(match[0]);}catch(e){}}
-  return parsed;
+
+function gerarQueryScholar(texto) {
+  const stop=['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','o','a','os','as','e','é','ao','se','sobre','como','foi','ser','estudo','análise','pesquisa'];
+  return texto.toLowerCase().replace(/[^\w\sáàãâéêíóôõúüç]/g,' ').split(/\s+/).filter(p=>p.length>2&&!stop.includes(p)).slice(0,6).join(' ');
 }
 
-// ── ARTIGO DA SEMANA ──────────────────────────────────────
-async function gerarArtigoSemana(){
+// ── FLUXO SESSÃO ──────────────────────────────────────────
+let estado={artigo:null,perguntas:[],qAtual:0,acertos:0};
+
+async function iniciarSessao() {
   const perf=loadPerfil();
   if(!perf){show('s-cadastro');return;}
-  setLoading('A IA está selecionando o artigo desta semana...');
-  try{
-    const projetoInfo=perf.projeto?'Projeto: "'+perf.projeto+'".':`Área: ${perf.areaNome}.`;
-    const txt=await chamarIA(`Você é um orientador acadêmico. ${projetoInfo} Sugira UM artigo científico real e existente para um estudante de ${perf.nivel} em ${perf.areaNome}. Responda APENAS com JSON válido sem markdown: {"titulo":"título do artigo","autores":"Autor et al. (ano)","resumo":"resumo em 3-4 frases em português descrevendo o artigo com detalhes","pontos_chave":["ponto 1","ponto 2","ponto 3","ponto 4","ponto 5"],"query_scholar":"3-5 palavras-chave para buscar no Google Acadêmico"}`);
-    const artigo=parseJSON(txt);
-    if(!artigo||!artigo.titulo) throw new Error('Artigo inválido');
-    const semana={artigo,inicioSemana:inicioSemana(),diasEstudados:[]};
-    saveSemana(semana);
-    renderHome(); show('s-home');
-  }catch(e){mostrarErro('Erro ao gerar artigo','Não foi possível conectar com a IA. Verifique sua internet.',gerarArtigoSemana);}
+  setLoading('A IA está buscando um artigo para o seu projeto...');
+  try {
+    const areaEl=document.getElementById('cad-area');
+    const areaNome=perf.areaNome||'Ciência dos Materiais';
+    const projetoInfo=perf.projeto?'O projeto de pesquisa do estudante é: "'+perf.projeto+'".':`Área: ${areaNome}.`;
+    const txt=await chamarIA(`Você é um orientador acadêmico. ${projetoInfo} Sugira UM artigo científico real e existente para um estudante de ${perf.nivel} em ${areaNome}. Responda APENAS com JSON válido, sem markdown: {"titulo":"título do artigo","autores":"Autor et al. (ano)","resumo":"2 frases em português","query_scholar":"3-5 palavras-chave"}`);
+    const artigo=JSON.parse(txt.replace(/```json|```/g,'').trim());
+    estado.artigo=artigo;
+    document.getElementById('art-tag').textContent=areaNome+' · '+perf.nivel;
+    document.getElementById('art-nivel-area').textContent=areaNome+' · '+perf.nivel;
+    document.getElementById('art-titulo').textContent=artigo.titulo;
+    document.getElementById('art-meta').textContent=artigo.autores+' — '+artigo.resumo;
+    const query=artigo.query_scholar||gerarQueryScholar(artigo.titulo);
+    document.getElementById('art-scholar').href='https://scholar.google.com/scholar?q='+encodeURIComponent(query)+'&hl=pt-BR';
+    const aq=document.getElementById('art-query');
+    aq.style.display='block'; aq.textContent='🔍 Busca: "'+query+'"';
+    show('s-artigo');
+  } catch(e) { mostrarErro('Erro ao buscar artigo', 'Não foi possível conectar com a IA. Verifique sua internet e tente novamente.', iniciarSessao); }
 }
 
-function verArtigoSemana(){
-  const semana=loadSemana();
-  if(!semana||!semana.artigo) return;
-  const a=semana.artigo;
-  const diaNum=diaAtualSemana();
-  const foco=FOCOS[Math.min(diaNum-1,6)];
-  document.getElementById('as-label').textContent='Artigo da semana · Dia '+diaNum+' de 7';
-  document.getElementById('as-titulo').textContent=a.titulo;
-  document.getElementById('as-autores').textContent=a.autores;
-  document.getElementById('as-resumo').textContent=a.resumo;
-  const pontosEl=document.getElementById('as-pontos');
-  pontosEl.innerHTML='';
-  if(a.pontos_chave){a.pontos_chave.forEach(p=>{const li=document.createElement('li');li.textContent=p;pontosEl.appendChild(li);});}
-  document.getElementById('as-scholar').href='https://scholar.google.com/scholar?q='+encodeURIComponent(a.query_scholar||a.titulo)+'&hl=pt-BR';
-  // dias da semana
-  const wdEl=document.getElementById('as-week-days');
-  wdEl.innerHTML=FOCOS.map((_,i)=>{
-    const dNum=i+1;
-    const cls=semana.diasEstudados&&semana.diasEstudados.some(d=>{const wd=new Date(d).getDay();return(wd===0?7:wd)===dNum;})?'done':dNum===diaNum?'today':'locked';
-    return '<div class="week-day '+cls+'">D'+dNum+'</div>';
-  }).join('');
-  document.getElementById('as-foco-badge').textContent='📌 Foco de hoje: '+foco;
-  const jaEstudou=diaJaEstudado(semana);
-  const btn=document.getElementById('as-btn-sessao');
-  if(jaEstudou){btn.textContent='✓ Sessão de hoje concluída';btn.disabled=true;btn.style.opacity='0.5';}
-  else{btn.textContent='Iniciar sessão de hoje →';btn.disabled=false;btn.style.opacity='1';}
-  show('s-artigo-semana');
-}
-
-// ── SESSÃO DO DIA ─────────────────────────────────────────
-let estado={perguntas:[],qAtual:0,acertos:0,diaNum:1,foco:''};
-
-async function iniciarSessaoDia(){
-  const semana=loadSemana();
+async function irPerguntas() {
   const perf=loadPerfil()||{nivel:'IC'};
-  if(!semana||!semana.artigo) return;
-  const diaNum=diaAtualSemana();
-  const foco=FOCOS[Math.min(diaNum-1,6)];
-  estado.diaNum=diaNum; estado.foco=foco;
-  setLoading('Gerando perguntas sobre "'+foco+'"...');
-  try{
-    const txt=await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${perf.nivel} sobre o artigo "${semana.artigo.titulo}". FOCO DESTA SESSÃO: "${foco}" — as perguntas devem explorar especificamente este aspecto do artigo. REGRAS: responda APENAS com array JSON puro sem texto antes/depois/markdown. FORMATO: [{"pergunta":"texto","opcoes":["A","B","C","D"],"correta":0,"explicacao":"explicação breve"}]`);
-    const parsed=parseJSON(txt);
+  setLoading('Gerando perguntas personalizadas para o seu nível...');
+  try {
+    const txt=await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${perf.nivel} sobre o artigo "${estado.artigo.titulo}". REGRAS: responda APENAS com um array JSON puro, sem texto antes, sem texto depois, sem markdown, sem backticks. Dificuldade: IC=compreensão básica, Mestrado=análise crítica, Doutorado=síntese avançada. FORMATO EXATO: [{"pergunta":"texto da pergunta aqui","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação curta"}] O campo correta é o índice 0-3 da opção correta.`);
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const match=clean.match(/\[[\s\S]*\]/);
+    let parsed=null;
+    try{parsed=JSON.parse(clean);}catch(e){}
+    if(!Array.isArray(parsed)){try{parsed=JSON.parse(match?match[0]:'[]');}catch(e){}}
     if(!Array.isArray(parsed)||parsed.length===0) throw new Error('JSON inválido');
     estado.perguntas=parsed; estado.qAtual=0; estado.acertos=0;
     showQ(); show('s-perguntas');
-  }catch(e){mostrarErro('Erro ao gerar perguntas','Não foi possível gerar as perguntas. Tente novamente.',iniciarSessaoDia);}
+  } catch(e) { mostrarErro('Erro ao gerar perguntas', 'A IA não conseguiu gerar as perguntas. Tente novamente ou volte ao artigo.', irPerguntas); }
 }
 
-function showQ(){
-  const q=estado.perguntas[estado.qAtual],total=estado.perguntas.length;
+function showQ() {
+  const q=estado.perguntas[estado.qAtual], total=estado.perguntas.length;
+  const perf=loadPerfil()||{nivel:'IC'};
   document.getElementById('prog').style.width=(estado.qAtual/total*100)+'%';
   document.getElementById('q-num').textContent='Pergunta '+(estado.qAtual+1)+' de '+total;
-  document.getElementById('q-foco').textContent=estado.foco;
+  document.getElementById('q-nivel').textContent=perf.nivel;
   document.getElementById('q-text').textContent=q.pergunta;
   document.getElementById('expl-box').innerHTML='';
   document.getElementById('btn-prox').style.display='none';
@@ -701,9 +702,9 @@ function showQ(){
   });
 }
 
-function responder(idx,btn){
+function responder(idx,btn) {
   const q=estado.perguntas[estado.qAtual];
-  document.querySelectorAll('.option').forEach(b=>b.onclick=null);
+  document.querySelectorAll('.option').forEach(function(b){b.onclick=null;});
   if(idx===q.correta){btn.classList.add('correct');estado.acertos++;}
   else{btn.classList.add('wrong');document.querySelectorAll('.option')[q.correta].classList.add('correct');}
   const expl=document.createElement('div');
@@ -712,30 +713,20 @@ function responder(idx,btn){
   document.getElementById('btn-prox').style.display='block';
 }
 
-function proxima(){
+function proxima() {
   estado.qAtual++;
   if(estado.qAtual<estado.perguntas.length) showQ();
   else mostrarResultado();
 }
 
-async function mostrarResultado(){
-  const ac=estado.acertos,tot=estado.perguntas.length,pct=ac/tot;
-  // Salvar progresso
+async function mostrarResultado() {
+  const ac=estado.acertos, tot=estado.perguntas.length, pct=ac/tot;
   const p=loadProgress();
   atualizarStreak(p); p.sessoes++; p.totalAcertos+=ac; p.totalPerguntas+=tot;
   if(pct===1) p.sessoesPerfei=(p.sessoesPerfei||0)+1;
-  // Marcar dia da semana como estudado
-  const semana=loadSemana();
-  if(semana){
-    if(!semana.diasEstudados) semana.diasEstudados=[];
-    if(!semana.diasEstudados.includes(hoje())) semana.diasEstudados.push(hoje());
-    if(semana.diasEstudados.length>=7) p.semanasCompletas=(p.semanasCompletas||0)+1;
-    saveSemana(semana);
-  }
   const novoBadges=checarBadges(p); saveProgress(p);
   document.getElementById('res-icon').textContent=pct===1?'🏆':pct>=0.5?'🎯':'📚';
   document.getElementById('res-score').textContent=ac+'/'+tot;
-  document.getElementById('res-dia-txt').textContent='Dia '+estado.diaNum+' de 7 concluído · '+estado.foco;
   document.getElementById('prog').style.width='100%';
   if(novoBadges.length>0){
     const b=novoBadges[0];
@@ -745,27 +736,56 @@ async function mostrarResultado(){
     document.getElementById('new-badge').style.display='block';
   } else { document.getElementById('new-badge').style.display='none'; }
   setLoading('Preparando seu feedback...');
-  try{
-    const feedback=await chamarIA(`Estudante de ${loadPerfil()?.nivel||'IC'} acertou ${ac} de ${tot} perguntas sobre "${estado.foco}" do artigo "${loadSemana()?.artigo?.titulo}". Dê feedback motivador em 2-3 frases em português.`);
+  try {
+    const feedback=await chamarIA(`Estudante acertou ${ac} de ${tot} perguntas sobre "${estado.artigo.titulo}". Dê um feedback motivador em 2-3 frases em português.`);
     document.getElementById('res-feedback').textContent=feedback;
-  }catch(e){
-    document.getElementById('res-feedback').textContent=pct===1?'Sessão perfeita! Excelente domínio do tema.':pct>=0.5?'Bom desempenho! Continue estudando o artigo.':'Continue tentando! A prática diária constrói expertise.';
+  } catch(e) {
+    document.getElementById('res-feedback').textContent=pct===1?'Sessão perfeita! Excelente!':pct>=0.5?'Bom desempenho! Continue praticando.':'Continue tentando! A prática diária constrói expertise.';
   }
   show('s-resultado');
 }
 
-function voltarHome(){renderHome();show('s-home');}
+function voltarHome() { renderHome(); show('s-home'); }
 
-// ── INIT ──────────────────────────────────────────────────
-function init(){
+// ── ERRO ──────────────────────────────────────────────────
+let erroCallback=null;
+function mostrarErro(titulo, desc, callback) {
+  document.getElementById('erro-title').textContent=titulo;
+  document.getElementById('erro-desc').textContent=desc;
+  erroCallback=callback;
+  show('s-erro');
+}
+function erroTentar() { if(erroCallback) erroCallback(); }
+
+// ── PERFIL ────────────────────────────────────────────────
+function irPerfil() {
+  const perf=loadPerfil()||{};
+  const p=loadProgress();
+  const inicial=(perf.nome||'?')[0].toUpperCase();
+  document.getElementById('perf-avatar').textContent=inicial;
+  document.getElementById('perf-nome').textContent=perf.nome||'Pesquisador';
+  document.getElementById('perf-nivel-area').textContent=(perf.nivel||'IC')+' · '+(perf.areaNome||'');
+  document.getElementById('perf-sessoes').textContent=p.sessoes;
+  document.getElementById('perf-acertos').textContent=p.totalAcertos;
+  const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
+  document.getElementById('perf-pct').textContent=pct+'%';
+  document.getElementById('perf-maior').textContent=p.maiorStreak+' dias';
+  document.getElementById('perf-badges').textContent=p.badges.length+'/'+BADGES_DEF.length;
+  document.getElementById('perf-projeto').textContent=perf.projeto||'Nenhum projeto descrito.';
+  show('s-perfil');
+}
+
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
+function init() {
+  const onboardingFeito=localStorage.getItem('cd_onboarding');
+  const perfil=loadPerfil();
   show('s-splash');
   setTimeout(function(){
-    const onb=localStorage.getItem('cd_onboarding');
-    const perf=loadPerfil();
-    if(!onb||!perf){show('s-onboarding');}
-    else{renderHome();show('s-home');}
-  },2000);
+    if(!onboardingFeito||!perfil) { show('s-onboarding'); }
+    else { renderHome(); show('s-home'); }
+  }, 2000);
 }
+
 init();
 </script>
 </body>
