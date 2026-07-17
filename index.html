@@ -1,791 +1,499 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>CientistaDiário</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
-    .app { max-width: 420px; margin: 0 auto; min-height: 100vh; background: #fff; position: relative; overflow: hidden; }
-    .screen { display: none; min-height: 100vh; }
-    .screen.active { display: flex; flex-direction: column; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes pop { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes slideIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>CientistaDiário</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f0f0f;color:#1a1a1a;min-height:100vh;}
+.app{max-width:420px;margin:0 auto;min-height:100vh;background:#fff;position:relative;overflow:hidden;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+.has-tabbar{padding-bottom:70px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pop{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 
-    /* ── SPLASH ── */
-    #s-splash { background: #1a1a1a; align-items: center; justify-content: center; }
-    .splash-logo { text-align: center; animation: pop 0.5s ease; }
-    .splash-logo .atom { font-size: 72px; margin-bottom: 16px; }
-    .splash-logo h1 { font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -1px; }
-    .splash-logo p { font-size: 15px; color: #888; margin-top: 6px; }
-    .splash-bar { width: 60px; height: 3px; background: #4f6ef7; border-radius: 2px; margin: 32px auto 0; animation: splashbar 2s ease forwards; }
-    @keyframes splashbar { from{width:0} to{width:200px} }
+#s-splash{background:#1a1a1a;align-items:center;justify-content:center;}
+.splash-logo{text-align:center;animation:pop 0.5s ease;}
+.splash-logo .atom{font-size:72px;margin-bottom:16px;}
+.splash-logo h1{font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px;}
+.splash-logo p{font-size:15px;color:#888;margin-top:6px;}
+.splash-bar{width:0;height:3px;background:#4f6ef7;border-radius:2px;margin:32px auto 0;animation:splashbar 2s ease forwards;}
+@keyframes splashbar{to{width:200px}}
 
-    /* ── ONBOARDING ── */
-    #s-onboarding { background: #fff; }
-    .ob-wrap { flex: 1; display: flex; flex-direction: column; }
-    .ob-slides { flex: 1; position: relative; overflow: hidden; }
-    .ob-slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; opacity: 0; transform: translateX(100%); transition: all 0.4s ease; }
-    .ob-slide.active { opacity: 1; transform: translateX(0); }
-    .ob-slide.prev { opacity: 0; transform: translateX(-100%); }
-    .ob-icon { font-size: 80px; margin-bottom: 24px; }
-    .ob-title { font-size: 26px; font-weight: 800; color: #1a1a1a; margin-bottom: 12px; line-height: 1.2; }
-    .ob-desc { font-size: 16px; color: #666; line-height: 1.6; max-width: 300px; }
-    .ob-dots { display: flex; justify-content: center; gap: 8px; padding: 20px 0; }
-    .ob-dot { width: 8px; height: 8px; border-radius: 4px; background: #ddd; transition: all 0.3s; }
-    .ob-dot.active { background: #1a1a1a; width: 24px; }
-    .ob-footer { padding: 1rem 1.5rem 2rem; }
-    .ob-footer .btn-primary { background: #1a1a1a; color: #fff; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .ob-skip { text-align: center; margin-top: 12px; font-size: 13px; color: #aaa; cursor: pointer; padding: 8px; }
+#s-onboarding{background:#fff;}
+.ob-wrap{flex:1;display:flex;flex-direction:column;}
+.ob-slides{flex:1;position:relative;overflow:hidden;}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;opacity:0;transform:translateX(100%);transition:all 0.4s ease;}
+.ob-slide.active{opacity:1;transform:translateX(0);}
+.ob-slide.prev{opacity:0;transform:translateX(-100%);}
+.ob-icon{font-size:80px;margin-bottom:24px;}
+.ob-title{font-size:26px;font-weight:800;color:#1a1a1a;margin-bottom:12px;line-height:1.2;}
+.ob-desc{font-size:16px;color:#666;line-height:1.6;max-width:300px;}
+.ob-dots{display:flex;justify-content:center;gap:8px;padding:20px 0;}
+.ob-dot{width:8px;height:8px;border-radius:4px;background:#ddd;transition:all 0.3s;}
+.ob-dot.active{background:#1a1a1a;width:24px;}
+.ob-footer{padding:1rem 1.5rem 2rem;}
+.ob-footer .btn-primary{background:#1a1a1a;color:#fff;border:none;width:100%;padding:16px;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;}
+.ob-skip{text-align:center;margin-top:12px;font-size:13px;color:#aaa;cursor:pointer;padding:8px;}
 
-    /* ── CADASTRO ── */
-    #s-cadastro { background: #fff; padding: 0; }
-    .cad-header { background: #1a1a1a; padding: 3rem 1.5rem 2rem; }
-    .cad-header h2 { font-size: 24px; font-weight: 800; color: #fff; }
-    .cad-header p { font-size: 14px; color: #aaa; margin-top: 4px; }
-    .cad-body { padding: 1.5rem; flex: 1; }
-    .field-group { margin-bottom: 20px; }
-    .field-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .field-input { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; }
-    .field-input:focus { border-color: #4f6ef7; background: #fff; }
-    .nivel-pills { display: flex; gap: 8px; }
-    .nivel-pill { flex: 1; padding: 12px 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1.5px solid #eee; background: #fafaf8; color: #888; text-align: center; transition: all 0.15s; }
-    .nivel-pill.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-    .field-select { width: 100%; padding: 14px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; color: #1a1a1a; background: #fafaf8; font-family: inherit; outline: none; appearance: none; }
-    .field-select:focus { border-color: #4f6ef7; }
+#s-cadastro{background:#fff;}
+.cad-header{background:#1a1a1a;padding:3rem 1.5rem 2rem;}
+.cad-header h2{font-size:24px;font-weight:800;color:#fff;}
+.cad-header p{font-size:14px;color:#aaa;margin-top:4px;}
+.cad-body{padding:1.5rem;flex:1;overflow-y:auto;}
+.field-group{margin-bottom:20px;}
+.field-label{font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.field-input{width:100%;padding:14px;border:1.5px solid #eee;border-radius:12px;font-size:15px;color:#1a1a1a;background:#fafaf8;font-family:inherit;outline:none;}
+.field-input:focus{border-color:#4f6ef7;background:#fff;}
+.nivel-pills{display:flex;gap:8px;}
+.nivel-pill{flex:1;padding:12px 0;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #eee;background:#fafaf8;color:#888;text-align:center;transition:all 0.15s;}
+.nivel-pill.selected{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.field-select{width:100%;padding:14px;border:1.5px solid #eee;border-radius:12px;font-size:15px;color:#1a1a1a;background:#fafaf8;font-family:inherit;outline:none;appearance:none;}
 
-    /* ── HOME ── */
-    #s-home { background: #f5f5f0; }
-    .home-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
-    .home-greet { font-size: 13px; color: #888; margin-bottom: 4px; }
-    .home-name { font-size: 22px; font-weight: 800; color: #fff; }
-    .home-streak { display: inline-flex; align-items: center; gap: 6px; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.3); border-radius: 20px; padding: 6px 14px; margin-top: 12px; }
-    .home-streak span { font-size: 14px; font-weight: 700; color: #fbbf24; }
-    .home-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
-    .home-section { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; margin-top: 20px; }
-    .home-section:first-child { margin-top: 0; }
+#s-home{background:#f5f5f0;}
+.home-header{background:#1a1a1a;padding:3rem 1.5rem 1.5rem;}
+.home-greet{font-size:13px;color:#888;}
+.home-name{font-size:22px;font-weight:800;color:#fff;margin-top:2px;}
+.home-streak{display:inline-flex;align-items:center;gap:6px;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:6px 14px;margin-top:12px;}
+.home-streak span{font-size:14px;font-weight:700;color:#fbbf24;}
+.home-body{padding:1.25rem;flex:1;overflow-y:auto;}
+.home-section{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;margin-top:20px;}
+.home-section:first-child{margin-top:0;}
+.session-card{background:#4f6ef7;border-radius:16px;padding:1.5rem;margin-bottom:16px;cursor:pointer;transition:transform 0.15s;}
+.session-card:active{transform:scale(0.98);}
+.session-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;}
+.session-card p{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;}
+.session-card .sc-btn{display:inline-block;background:#fff;color:#4f6ef7;font-size:13px;font-weight:700;padding:8px 18px;border-radius:20px;margin-top:14px;}
+.session-card.done{background:#e8e8e4;cursor:default;}
+.session-card.done h3,.session-card.done p{color:#888;}
+.session-card.done .sc-btn{background:#ccc;color:#fff;}
+.studied-banner{background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:1rem 1.25rem;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.studied-banner .sb-icon{font-size:28px;}
+.studied-banner .sb-text{font-size:14px;font-weight:600;color:#15803d;}
+.studied-banner .sb-sub{font-size:12px;color:#16a34a;margin-top:2px;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:#fff;border-radius:14px;padding:1rem;}
+.stat-card .sc-num{font-size:28px;font-weight:800;color:#1a1a1a;}
+.stat-card .sc-lbl{font-size:12px;color:#888;margin-top:2px;}
+.stat-card .sc-icon{font-size:20px;margin-bottom:8px;}
+.cal-card{background:#fff;border-radius:14px;padding:1rem;margin-bottom:16px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;}
+.cal-cell{aspect-ratio:1;border-radius:6px;background:#f5f5f0;}
+.cal-cell.done{background:#4f6ef7;}
+.cal-cell.today{background:#fbbf24;}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-day-lbl{font-size:9px;color:#bbb;text-align:center;font-weight:600;}
+.badges-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.badge-card{background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;}
+.badge-card.locked{opacity:0.4;}
+.badge-card .bi{font-size:28px;}
+.badge-card .bt{font-size:12px;font-weight:700;color:#1a1a1a;}
+.badge-card .bd{font-size:10px;color:#888;margin-top:2px;}
 
-    /* Card de sessão */
-    .session-card { background: #4f6ef7; border-radius: 16px; padding: 1.5rem; margin-bottom: 16px; cursor: pointer; transition: transform 0.15s; }
-    .session-card:active { transform: scale(0.98); }
-    .session-card h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-    .session-card p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
-    .session-card .sc-btn { display: inline-block; background: #fff; color: #4f6ef7; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 20px; margin-top: 14px; }
+#s-biblioteca{background:#f5f5f0;}
+.bib-header{background:#1a1a1a;padding:3rem 1.5rem 1.5rem;}
+.bib-header h2{font-size:22px;font-weight:800;color:#fff;}
+.bib-header p{font-size:13px;color:#888;margin-top:4px;}
+.bib-body{padding:1.25rem;flex:1;overflow-y:auto;}
+.bib-empty{text-align:center;padding:3rem 1rem;color:#bbb;}
+.bib-empty .be-icon{font-size:48px;margin-bottom:12px;}
+.bib-empty p{font-size:14px;line-height:1.6;}
+.bib-item{background:#fff;border-radius:14px;padding:1.25rem;margin-bottom:12px;}
+.bib-item .bi-date{font-size:11px;color:#4f6ef7;font-weight:600;margin-bottom:6px;}
+.bib-item .bi-title{font-size:15px;font-weight:700;color:#1a1a1a;line-height:1.4;margin-bottom:4px;}
+.bib-item .bi-authors{font-size:12px;color:#888;margin-bottom:10px;}
+.bib-item .bi-resumo{font-size:13px;color:#555;line-height:1.6;max-height:0;overflow:hidden;transition:max-height 0.3s ease;}
+.bib-item .bi-resumo.open{max-height:600px;}
+.bib-item .bi-toggle{font-size:12px;color:#4f6ef7;font-weight:600;cursor:pointer;margin-top:8px;display:inline-block;}
+.bib-item .bi-score{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:8px;}
+.bib-item .bi-score.good{background:#f0fdf4;color:#16a34a;}
+.bib-item .bi-scholar{font-size:12px;color:#4f6ef7;text-decoration:none;display:block;margin-top:10px;}
 
-    /* Stats cards */
-    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .stat-card { background: #fff; border-radius: 14px; padding: 1rem; }
-    .stat-card .sc-num { font-size: 28px; font-weight: 800; color: #1a1a1a; }
-    .stat-card .sc-lbl { font-size: 12px; color: #888; margin-top: 2px; }
-    .stat-card .sc-icon { font-size: 20px; margin-bottom: 8px; }
+#s-perfil{background:#f5f5f0;}
+.perfil-header{background:#1a1a1a;padding:3rem 1.5rem 1.5rem;display:flex;align-items:center;gap:14px;}
+.perfil-avatar{width:52px;height:52px;background:#4f6ef7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0;}
+.perfil-info h2{font-size:20px;font-weight:800;color:#fff;}
+.perfil-info p{font-size:13px;color:#888;margin-top:2px;}
+.perfil-body{padding:1.25rem;flex:1;overflow-y:auto;}
+.perfil-card{background:#fff;border-radius:14px;padding:1.25rem;margin-bottom:12px;}
+.perfil-card h3{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;}
+.perfil-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f0;}
+.perfil-row:last-child{border-bottom:none;}
+.perfil-row .pr-label{font-size:14px;color:#888;}
+.perfil-row .pr-value{font-size:14px;font-weight:600;color:#1a1a1a;}
 
-    /* Calendário */
-    .cal-card { background: #fff; border-radius: 14px; padding: 1rem; margin-bottom: 16px; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
-    .cal-cell { aspect-ratio: 1; border-radius: 6px; background: #f5f5f0; }
-    .cal-cell.done { background: #4f6ef7; }
-    .cal-cell.today { background: #fbbf24; }
-    .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
-    .cal-day-lbl { font-size: 9px; color: #bbb; text-align: center; font-weight: 600; }
+/* TAB BAR */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:420px;background:#fff;border-top:1px solid #eee;display:flex;padding:8px 0 12px;z-index:100;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;}
+.tab .tab-icon{font-size:20px;opacity:0.4;transition:opacity 0.15s;}
+.tab .tab-lbl{font-size:10px;color:#bbb;font-weight:600;}
+.tab.active .tab-icon{opacity:1;}
+.tab.active .tab-lbl{color:#1a1a1a;}
 
-    /* Badges */
-    .badges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .badge-card { background: #fff; border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 10px; }
-    .badge-card.locked { opacity: 0.4; }
-    .badge-card .bi { font-size: 28px; }
-    .badge-card .bt { font-size: 12px; font-weight: 700; color: #1a1a1a; }
-    .badge-card .bd { font-size: 10px; color: #888; margin-top: 2px; }
+#s-artigo{background:#fff;}
+.art-header{background:#1a1a1a;padding:3rem 1.5rem 1.5rem;}
+.art-header h2{font-size:20px;font-weight:700;color:#fff;}
+.art-header p{font-size:13px;color:#888;margin-top:4px;}
+.art-body{padding:1.25rem;flex:1;overflow-y:auto;}
+.art-card{background:#fafaf8;border:1px solid #e8e8e4;border-radius:14px;padding:1.25rem;margin-bottom:16px;}
+.art-tag{display:inline-block;background:#eef2ff;color:#4f6ef7;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+.art-title{font-size:16px;font-weight:700;color:#1a1a1a;line-height:1.45;margin-bottom:6px;}
+.art-authors{font-size:12px;color:#888;margin-bottom:14px;}
+.art-resumo-label{font-size:11px;font-weight:700;color:#4f6ef7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.art-resumo{font-size:14px;color:#444;line-height:1.7;}
+.art-source{font-size:11px;color:#aaa;margin-top:12px;font-style:italic;}
+.scholar-btn{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#4f6ef7;font-size:13px;font-weight:600;padding:10px 16px;border-radius:20px;text-decoration:none;margin-top:14px;}
+.info-pill{display:inline-block;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:500;padding:8px 14px;border-radius:20px;margin-bottom:16px;border:1px solid #bbf7d0;}
 
-    /* Configuração rápida */
-    .config-card { background: #fff; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 10px; }
-    .config-row { display: flex; align-items: center; justify-content: space-between; }
-    .config-label { font-size: 14px; color: #1a1a1a; font-weight: 500; }
-    .config-value { font-size: 14px; color: #4f6ef7; font-weight: 600; }
-    .config-edit { font-size: 12px; color: #bbb; cursor: pointer; }
+.btn{width:100%;padding:16px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;transition:transform 0.1s;border:none;}
+.btn:active{transform:scale(0.98);}
+.btn-dark{background:#1a1a1a;color:#fff;}
+.btn-blue{background:#4f6ef7;color:#fff;}
+.btn-ghost{background:transparent;color:#888;border:1.5px solid #eee;}
 
-    /* ── ARTIGO ── */
-    #s-artigo { background: #fff; }
-    .art-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; }
-    .art-header h2 { font-size: 20px; font-weight: 700; color: #fff; }
-    .art-header p { font-size: 13px; color: #888; margin-top: 4px; }
-    .art-body { padding: 1.25rem; flex: 1; }
-    .art-card { background: #fafaf8; border: 1px solid #e8e8e4; border-radius: 14px; padding: 1.25rem; margin-bottom: 16px; }
-    .art-tag { display: inline-block; background: #eef2ff; color: #4f6ef7; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
-    .art-title { font-size: 15px; font-weight: 700; color: #1a1a1a; line-height: 1.45; margin-bottom: 8px; }
-    .art-meta { font-size: 13px; color: #666; line-height: 1.5; }
-    .art-query { font-size: 12px; color: #4f6ef7; margin-top: 8px; }
-    .scholar-btn { display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; color: #4f6ef7; font-size: 13px; font-weight: 600; padding: 10px 16px; border-radius: 20px; text-decoration: none; margin-top: 12px; }
-    .info-pill { display: inline-block; background: #f0fdf4; color: #16a34a; font-size: 12px; font-weight: 500; padding: 8px 14px; border-radius: 20px; margin-bottom: 16px; border: 1px solid #bbf7d0; }
+#s-loading{background:#fff;align-items:center;justify-content:center;}
+.loading-inner{text-align:center;padding:2rem;}
+.spinner{width:40px;height:40px;border:3px solid #eee;border-top-color:#4f6ef7;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;}
+.loading-msg{font-size:15px;color:#888;}
 
-    /* ── BOTÕES GERAIS ── */
-    .btn { width: 100%; padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 10px; transition: transform 0.1s; border: none; }
-    .btn:active { transform: scale(0.98); }
-    .btn-dark { background: #1a1a1a; color: #fff; }
-    .btn-dark:hover { background: #333; }
-    .btn-ghost { background: transparent; color: #888; border: 1.5px solid #eee; }
+#s-perguntas{background:#fff;padding:1.25rem;}
+.q-progress{height:5px;background:#f0f0f0;border-radius:3px;margin-bottom:24px;overflow:hidden;}
+.q-progress-fill{height:100%;background:#4f6ef7;border-radius:3px;transition:width 0.4s ease;}
+.q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.q-num{font-size:12px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;}
+.q-nivel{font-size:11px;color:#4f6ef7;font-weight:600;background:#eef2ff;padding:3px 8px;border-radius:6px;}
+.q-text{font-size:17px;font-weight:700;color:#1a1a1a;line-height:1.5;margin-bottom:20px;}
+.option{display:block;width:100%;text-align:left;padding:14px 16px;background:#fafaf8;border:1.5px solid #e8e8e4;border-radius:12px;font-size:14px;color:#1a1a1a;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:all 0.15s;line-height:1.4;}
+.option:hover{background:#f0f0f0;border-color:#ccc;}
+.option.correct{background:#f0fdf4;border-color:#86efac;color:#15803d;animation:bounce 0.3s ease;}
+.option.wrong{background:#fff1f2;border-color:#fca5a5;color:#dc2626;animation:shake 0.3s ease;}
+.expl{font-size:13px;color:#555;background:#f8f9ff;border:1px solid #e0e7ff;border-radius:10px;padding:12px 14px;margin-top:10px;line-height:1.55;}
+.expl::before{content:'💡 ';}
 
-    /* ── LOADING ── */
-    #s-loading { background: #fff; align-items: center; justify-content: center; }
-    .loading-inner { text-align: center; padding: 2rem; }
-    .spinner { width: 40px; height: 40px; border: 3px solid #eee; border-top-color: #4f6ef7; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-    .loading-msg { font-size: 15px; color: #888; }
+#s-resultado{background:#f5f5f0;align-items:center;justify-content:flex-start;padding:2rem 1.5rem;overflow-y:auto;}
+.res-top{text-align:center;width:100%;padding:1rem 0;}
+.res-icon{font-size:72px;animation:pop 0.4s ease;margin-bottom:8px;}
+.res-score{font-size:52px;font-weight:800;color:#1a1a1a;}
+.res-sub{font-size:14px;color:#888;margin-top:4px;margin-bottom:16px;}
+.res-status{border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:16px;width:100%;font-size:14px;font-weight:600;}
+.res-status.aprovado{background:#f0fdf4;color:#16a34a;}
+.res-status.reprovado{background:#fff1f2;color:#dc2626;}
+.new-badge-card{background:#fef3c7;border:1.5px solid #fbbf24;border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;width:100%;display:none;animation:pop 0.4s ease;}
+.nb-icon{font-size:36px;}
+.nb-title{font-size:15px;font-weight:700;color:#92400e;margin-top:6px;}
+.nb-desc{font-size:12px;color:#b45309;}
+.res-feedback{background:#fff;border-radius:16px;padding:1.25rem;font-size:14px;color:#555;line-height:1.65;width:100%;margin-bottom:16px;}
+.res-btns{width:100%;}
 
-    /* ── PERGUNTAS ── */
-    #s-perguntas { background: #fff; padding: 1.25rem; }
-    .q-progress { height: 5px; background: #f0f0f0; border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
-    .q-progress-fill { height: 100%; background: #4f6ef7; border-radius: 3px; transition: width 0.4s ease; }
-    .q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .q-num { font-size: 12px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
-    .q-nivel { font-size: 11px; color: #4f6ef7; font-weight: 600; background: #eef2ff; padding: 3px 8px; border-radius: 6px; }
-    .q-text { font-size: 17px; font-weight: 700; color: #1a1a1a; line-height: 1.5; margin-bottom: 20px; }
-    .option { display: block; width: 100%; text-align: left; padding: 14px 16px; background: #fafaf8; border: 1.5px solid #e8e8e4; border-radius: 12px; font-size: 14px; color: #1a1a1a; cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: all 0.15s; line-height: 1.4; }
-    .option:hover { background: #f0f0f0; border-color: #ccc; }
-    .option.correct { background: #f0fdf4; border-color: #86efac; color: #15803d; }
-    .option.wrong { background: #fff1f2; border-color: #fca5a5; color: #dc2626; }
-    .expl { font-size: 13px; color: #555; background: #f8f9ff; border: 1px solid #e0e7ff; border-radius: 10px; padding: 12px 14px; margin-top: 10px; line-height: 1.55; }
-    .expl::before { content: '💡 '; }
-
-    /* ── RESULTADO ── */
-    #s-resultado { background: #f5f5f0; align-items: center; justify-content: flex-start; padding: 2rem 1.5rem; }
-    .res-top { text-align: center; width: 100%; padding: 1rem 0; }
-    .res-icon { font-size: 72px; animation: pop 0.4s ease; margin-bottom: 8px; }
-    .res-score { font-size: 52px; font-weight: 800; color: #1a1a1a; }
-    .res-sub { font-size: 14px; color: #888; margin-top: 4px; margin-bottom: 24px; }
-    .new-badge-card { background: #fef3c7; border: 1.5px solid #fbbf24; border-radius: 16px; padding: 16px; margin-bottom: 16px; text-align: center; width: 100%; display: none; animation: pop 0.4s ease; }
-    .nb-icon { font-size: 36px; }
-    .nb-title { font-size: 15px; font-weight: 700; color: #92400e; margin-top: 6px; }
-    .nb-desc { font-size: 12px; color: #b45309; }
-    .res-feedback { background: #fff; border-radius: 16px; padding: 1.25rem; font-size: 14px; color: #555; line-height: 1.65; width: 100%; margin-bottom: 16px; }
-    .res-btns { width: 100%; }
-
-    .footer { text-align: center; font-size: 11px; color: #ccc; padding: 16px 0 8px; }
-    .err { color: #dc2626; font-size: 13px; text-align: center; margin-top: 10px; }
-
-    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-    .option.correct { animation: bounce 0.3s ease; }
-    .option.wrong { animation: shake 0.3s ease; }
-
-    .studied-banner { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-    .studied-banner .sb-icon { font-size: 28px; }
-    .studied-banner .sb-text { font-size: 14px; font-weight: 600; color: #15803d; }
-    .studied-banner .sb-sub { font-size: 12px; color: #16a34a; margin-top: 2px; }
-
-    .session-card.done { background: #e8e8e4; cursor: default; }
-    .session-card.done .sc-btn { background: #ccc; color: #888; }
-
-    #s-erro { background: #fff; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-    .erro-icon { font-size: 56px; margin-bottom: 16px; }
-    .erro-title { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
-    .erro-desc { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 24px; }
-
-    #s-perfil { background: #f5f5f0; }
-    .perfil-header { background: #1a1a1a; padding: 3rem 1.5rem 1.5rem; display: flex; align-items: center; gap: 14px; }
-    .perfil-avatar { width: 52px; height: 52px; background: #4f6ef7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; flex-shrink: 0; }
-    .perfil-info h2 { font-size: 20px; font-weight: 800; color: #fff; }
-    .perfil-info p { font-size: 13px; color: #888; margin-top: 2px; }
-    .perfil-body { padding: 1.25rem; }
-    .perfil-card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 12px; }
-    .perfil-card h3 { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
-    .perfil-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f0; }
-    .perfil-row:last-child { border-bottom: none; }
-    .perfil-row .pr-label { font-size: 14px; color: #888; }
-    .perfil-row .pr-value { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-  </style>
+#s-erro{background:#fff;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+.erro-icon{font-size:56px;margin-bottom:16px;}
+.erro-title{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:8px;}
+.erro-desc{font-size:14px;color:#888;line-height:1.6;margin-bottom:24px;}
+.footer{text-align:center;font-size:11px;color:#ccc;padding:16px 0 8px;}
+.err{color:#dc2626;font-size:13px;text-align:center;margin-top:10px;}
+</style>
 </head>
 <body>
 <div class="app">
+<div class="screen" id="s-splash"><div class="splash-logo"><div class="atom">⚛️</div><h1>CientistaDiário</h1><p>Sua sessão de pesquisa diária</p><div class="splash-bar"></div></div></div>
 
-  <!-- SPLASH -->
-  <div class="screen" id="s-splash">
-    <div class="splash-logo">
-      <div class="atom">⚛️</div>
-      <h1>CientistaDiário</h1>
-      <p>Sua sessão de pesquisa diária</p>
-      <div class="splash-bar"></div>
-    </div>
-  </div>
+<div class="screen" id="s-onboarding"><div class="ob-wrap"><div class="ob-slides">
+<div class="ob-slide active" id="ob0"><div class="ob-icon">📰</div><h2 class="ob-title">Resumos todo dia</h2><p class="ob-desc">A IA busca artigos científicos reais e recentes da sua área e apresenta um resumo direto no app.</p></div>
+<div class="ob-slide" id="ob1"><div class="ob-icon">🧠</div><h2 class="ob-title">Leia e responda</h2><p class="ob-desc">Leia o resumo e responda 5 perguntas. Acerte mais de 50% para concluir a sessão do dia.</p></div>
+<div class="ob-slide" id="ob2"><div class="ob-icon">📚</div><h2 class="ob-title">Sua biblioteca</h2><p class="ob-desc">Todos os artigos que você estudar ficam salvos. Mantenha seu streak e construa conhecimento diário.</p></div>
+</div><div class="ob-dots"><div class="ob-dot active" id="dot0"></div><div class="ob-dot" id="dot1"></div><div class="ob-dot" id="dot2"></div></div>
+<div class="ob-footer"><button class="btn-primary" id="ob-btn" onclick="obNext()">Próximo →</button><div class="ob-skip" onclick="irCadastro()">Pular</div></div></div></div>
 
-  <!-- ONBOARDING -->
-  <div class="screen" id="s-onboarding">
-    <div class="ob-wrap">
-      <div class="ob-slides">
-        <div class="ob-slide active" id="ob0">
-          <div class="ob-icon">📰</div>
-          <h2 class="ob-title">Um artigo por dia</h2>
-          <p class="ob-desc">A IA seleciona artigos científicos reais baseados no seu projeto de pesquisa e nível acadêmico.</p>
-        </div>
-        <div class="ob-slide" id="ob1">
-          <div class="ob-icon">🧠</div>
-          <h2 class="ob-title">Perguntas no seu nível</h2>
-          <p class="ob-desc">Questões adaptadas para IC, Mestrado ou Doutorado — do básico à análise crítica avançada.</p>
-        </div>
-        <div class="ob-slide" id="ob2">
-          <div class="ob-icon">🔥</div>
-          <h2 class="ob-title">Construa seu streak</h2>
-          <p class="ob-desc">Estude todo dia, mantenha sua sequência e conquiste badges. A consistência é o que forma pesquisadores.</p>
-        </div>
-      </div>
-      <div class="ob-dots">
-        <div class="ob-dot active" id="dot0"></div>
-        <div class="ob-dot" id="dot1"></div>
-        <div class="ob-dot" id="dot2"></div>
-      </div>
-      <div class="ob-footer">
-        <button class="btn-primary" id="ob-btn" onclick="obNext()">Próximo →</button>
-        <div class="ob-skip" onclick="irCadastro()">Pular</div>
-      </div>
-    </div>
-  </div>
+<div class="screen" id="s-cadastro"><div class="cad-header"><h2>Vamos começar 🚀</h2><p>Conta um pouco sobre você e sua pesquisa</p></div>
+<div class="cad-body">
+<div class="field-group"><div class="field-label">Seu nome</div><input type="text" class="field-input" id="cad-nome" placeholder="Ex: Douglas" /></div>
+<div class="field-group"><div class="field-label">Nível acadêmico</div><div class="nivel-pills"><button class="nivel-pill selected" onclick="selecionarNivel('IC',this)">IC</button><button class="nivel-pill" onclick="selecionarNivel('Mestrado',this)">Mestrado</button><button class="nivel-pill" onclick="selecionarNivel('Doutorado',this)">Doutorado</button></div></div>
+<div class="field-group"><div class="field-label">Área de pesquisa</div><select class="field-select" id="cad-area"><option value="materiais">Ciência dos Materiais</option><option value="biologia">Biologia</option><option value="quimica">Química</option><option value="fisica">Física</option><option value="engenharia">Engenharia</option><option value="computacao">Ciência da Computação</option><option value="medicina">Medicina</option><option value="agronomia">Agronomia</option></select></div>
+<div class="field-group"><div class="field-label">Descreva seu projeto</div><textarea class="field-input" id="cad-projeto" placeholder="Ex: degradação fotocatalítica de corantes usando ZnO dopado com európio..." style="height:85px;resize:none;"></textarea></div>
+<button class="btn btn-dark" onclick="salvarCadastro()">Começar a estudar →</button><p class="err" id="err-cad"></p></div></div>
 
-  <!-- CADASTRO -->
-  <div class="screen" id="s-cadastro">
-    <div class="cad-header">
-      <h2>Vamos começar 🚀</h2>
-      <p>Conta um pouco sobre você e sua pesquisa</p>
-    </div>
-    <div class="cad-body">
-      <div class="field-group">
-        <div class="field-label">Seu nome</div>
-        <input type="text" class="field-input" id="cad-nome" placeholder="Ex: Douglas" />
-      </div>
-      <div class="field-group">
-        <div class="field-label">Nível acadêmico</div>
-        <div class="nivel-pills">
-          <button class="nivel-pill selected" onclick="selecionarNivel('IC', this)">IC</button>
-          <button class="nivel-pill" onclick="selecionarNivel('Mestrado', this)">Mestrado</button>
-          <button class="nivel-pill" onclick="selecionarNivel('Doutorado', this)">Doutorado</button>
-        </div>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Área de pesquisa</div>
-        <select class="field-select" id="cad-area">
-          <option value="materiais">Ciência dos Materiais</option>
-          <option value="biologia">Biologia</option>
-          <option value="quimica">Química</option>
-          <option value="fisica">Física</option>
-          <option value="engenharia">Engenharia</option>
-          <option value="computacao">Ciência da Computação</option>
-          <option value="medicina">Medicina</option>
-          <option value="agronomia">Agronomia</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <div class="field-label">Descreva seu projeto</div>
-        <textarea class="field-input" id="cad-projeto" placeholder="Ex: degradação fotocatalítica de corantes usando ZnO dopado com európio..." style="height:85px;resize:none;"></textarea>
-      </div>
-      <button class="btn btn-dark" onclick="salvarCadastro()">Começar a estudar →</button>
-      <p class="err" id="err-cad"></p>
-    </div>
-  </div>
+<div class="screen has-tabbar" id="s-home"><div class="home-header"><div class="home-greet">Bem-vindo de volta,</div><div class="home-name" id="home-nome">Pesquisador</div><div class="home-streak"><span id="home-streak-num">0🔥</span><span style="font-size:13px;color:#aaa;" id="home-streak-lbl">dias de sequência</span></div></div>
+<div class="home-body">
+<div class="studied-banner" id="studied-banner" style="display:none;"><div class="sb-icon">✅</div><div><div class="sb-text">Sessão de hoje concluída!</div><div class="sb-sub" id="studied-sub">Volte amanhã.</div></div></div>
+<div class="session-card" id="session-card" onclick="iniciarSessao()"><h3>Sessão de hoje</h3><p id="home-sessao-desc">A IA vai buscar um artigo recente da sua área e gerar perguntas sobre o resumo.</p><div class="sc-btn" id="session-btn">Iniciar agora →</div></div>
+<div class="home-section">Seu progresso</div>
+<div class="stats-row"><div class="stat-card"><div class="sc-icon">📚</div><div class="sc-num" id="h-sessoes">0</div><div class="sc-lbl">sessões completadas</div></div><div class="stat-card"><div class="sc-icon">🎯</div><div class="sc-num" id="h-pct">0%</div><div class="sc-lbl">aproveitamento</div></div><div class="stat-card"><div class="sc-icon">✅</div><div class="sc-num" id="h-acertos">0</div><div class="sc-lbl">respostas certas</div></div><div class="stat-card"><div class="sc-icon">⚡</div><div class="sc-num" id="h-maior">0</div><div class="sc-lbl">maior sequência</div></div></div>
+<div class="home-section">Histórico de estudos</div>
+<div class="cal-card"><div class="cal-days-header"><div class="cal-day-lbl">D</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">S</div></div><div class="cal-grid" id="h-calendar"></div></div>
+<div class="home-section">Conquistas</div><div class="badges-grid" id="h-badges"></div>
+<div class="footer">CientistaDiário · v0.4</div></div>
+<div class="tabbar"><div class="tab active" onclick="navTab('s-home',this)"><div class="tab-icon">🏠</div><div class="tab-lbl">Início</div></div><div class="tab" onclick="navTab('s-biblioteca',this)"><div class="tab-icon">📚</div><div class="tab-lbl">Biblioteca</div></div><div class="tab" onclick="navTab('s-perfil',this)"><div class="tab-icon">👤</div><div class="tab-lbl">Perfil</div></div></div></div>
 
-  <!-- HOME -->
-  <div class="screen" id="s-home">
-    <div class="home-header">
-      <div class="home-greet">Bem-vindo de volta,</div>
-      <div class="home-name" id="home-nome">Pesquisador</div>
-      <div class="home-streak">
-        <span id="home-streak-num">0🔥</span>
-        <span style="font-size:13px;color:#aaa;" id="home-streak-lbl">dias de sequência</span>
-      </div>
-    </div>
-    <div class="home-body">
+<div class="screen has-tabbar" id="s-biblioteca"><div class="bib-header"><h2>Biblioteca</h2><p id="bib-count">Artigos que você já estudou</p></div>
+<div class="bib-body" id="bib-body"></div>
+<div class="tabbar"><div class="tab" onclick="navTab('s-home',this)"><div class="tab-icon">🏠</div><div class="tab-lbl">Início</div></div><div class="tab active" onclick="navTab('s-biblioteca',this)"><div class="tab-icon">📚</div><div class="tab-lbl">Biblioteca</div></div><div class="tab" onclick="navTab('s-perfil',this)"><div class="tab-icon">👤</div><div class="tab-lbl">Perfil</div></div></div></div>
 
-      <!-- Banner já estudou hoje -->
-      <div class="studied-banner" id="studied-banner" style="display:none;">
-        <div class="sb-icon">✅</div>
-        <div>
-          <div class="sb-text">Sessão de hoje concluída!</div>
-          <div class="sb-sub" id="studied-sub">Volte amanhã para manter seu streak.</div>
-        </div>
-      </div>
+<div class="screen has-tabbar" id="s-perfil"><div class="perfil-header"><div class="perfil-avatar" id="perf-avatar">?</div><div class="perfil-info"><h2 id="perf-nome">—</h2><p id="perf-nivel-area">—</p></div></div>
+<div class="perfil-body">
+<div class="perfil-card"><h3>Estatísticas</h3><div class="perfil-row"><span class="pr-label">Sessões completadas</span><span class="pr-value" id="perf-sessoes">0</span></div><div class="perfil-row"><span class="pr-label">Artigos lidos</span><span class="pr-value" id="perf-artigos">0</span></div><div class="perfil-row"><span class="pr-label">Respostas certas</span><span class="pr-value" id="perf-acertos">0</span></div><div class="perfil-row"><span class="pr-label">Aproveitamento</span><span class="pr-value" id="perf-pct">0%</span></div><div class="perfil-row"><span class="pr-label">Maior sequência</span><span class="pr-value" id="perf-maior">0 dias</span></div><div class="perfil-row"><span class="pr-label">Badges</span><span class="pr-value" id="perf-badges">0</span></div></div>
+<div class="perfil-card"><h3>Projeto de pesquisa</h3><div style="font-size:14px;color:#555;line-height:1.6;" id="perf-projeto">—</div></div>
+<button class="btn btn-dark" onclick="irEditarPerfil()">Editar perfil →</button></div>
+<div class="tabbar"><div class="tab" onclick="navTab('s-home',this)"><div class="tab-icon">🏠</div><div class="tab-lbl">Início</div></div><div class="tab" onclick="navTab('s-biblioteca',this)"><div class="tab-icon">📚</div><div class="tab-lbl">Biblioteca</div></div><div class="tab active" onclick="navTab('s-perfil',this)"><div class="tab-icon">👤</div><div class="tab-lbl">Perfil</div></div></div></div>
 
-      <!-- Botão iniciar sessão -->
-      <div class="session-card" id="session-card" onclick="iniciarSessao()">
-        <h3>Sessão de hoje</h3>
-        <p id="home-sessao-desc">A IA vai sugerir um artigo baseado no seu projeto e gerar perguntas personalizadas.</p>
-        <div class="sc-btn" id="session-btn">Iniciar agora →</div>
-      </div>
+<div class="screen" id="s-loading"><div class="loading-inner"><div class="spinner"></div><p class="loading-msg" id="loading-msg">Aguarde...</p></div></div>
 
-      <!-- Stats -->
-      <div class="home-section">Seu progresso</div>
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="sc-icon">📚</div>
-          <div class="sc-num" id="h-sessoes">0</div>
-          <div class="sc-lbl">sessões completadas</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-icon">🎯</div>
-          <div class="sc-num" id="h-pct">0%</div>
-          <div class="sc-lbl">de aproveitamento</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-icon">✅</div>
-          <div class="sc-num" id="h-acertos">0</div>
-          <div class="sc-lbl">respostas certas</div>
-        </div>
-        <div class="stat-card">
-          <div class="sc-icon">⚡</div>
-          <div class="sc-num" id="h-maior">0</div>
-          <div class="sc-lbl">maior sequência</div>
-        </div>
-      </div>
+<div class="screen" id="s-artigo"><div class="art-header"><h2>Artigo de hoje</h2><p id="art-nivel-area">—</p></div>
+<div class="art-body">
+<div class="art-card"><span class="art-tag" id="art-tag">—</span><p class="art-title" id="art-titulo">—</p><p class="art-authors" id="art-authors">—</p><div class="art-resumo-label">Resumo</div><div class="art-resumo" id="art-resumo">—</div><p class="art-source" id="art-source"></p><a id="art-scholar" href="#" target="_blank" class="scholar-btn">🎓 Ver artigo completo</a></div>
+<div class="info-pill">📖 Leia o resumo — as perguntas são sobre ele</div>
+<button class="btn btn-dark" onclick="irPerguntas()">Li o resumo — vamos às perguntas →</button>
+<button class="btn btn-ghost" onclick="voltarHome()">Voltar ao início</button></div></div>
 
-      <!-- Calendário -->
-      <div class="home-section">Histórico de estudos</div>
-      <div class="cal-card">
-        <div class="cal-days-header">
-          <div class="cal-day-lbl">D</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div>
-          <div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div>
-          <div class="cal-day-lbl">S</div>
-        </div>
-        <div class="cal-grid" id="h-calendar"></div>
-      </div>
+<div class="screen" id="s-perguntas"><div class="q-progress"><div class="q-progress-fill" id="prog" style="width:0%"></div></div>
+<div class="q-header"><span class="q-num" id="q-num">Pergunta 1 de 5</span><span class="q-nivel" id="q-nivel">IC</span></div>
+<div class="q-text" id="q-text"></div><div id="opts"></div><div id="expl-box"></div>
+<button class="btn btn-dark" id="btn-prox" style="display:none;margin-top:14px" onclick="proxima()">Próxima →</button></div>
 
-      <!-- Badges -->
-      <div class="home-section">Conquistas</div>
-      <div class="badges-grid" id="h-badges"></div>
+<div class="screen" id="s-resultado"><div class="res-top"><div class="res-icon" id="res-icon">🎉</div><div class="res-score" id="res-score">0/5</div><div class="res-sub">perguntas certas</div></div>
+<div class="res-status" id="res-status"></div>
+<div class="new-badge-card" id="new-badge"><div class="nb-icon" id="nb-icon">🏅</div><div class="nb-title" id="nb-title">Badge!</div><div class="nb-desc" id="nb-desc"></div></div>
+<div class="res-feedback" id="res-feedback"></div>
+<div class="res-btns" id="res-btns"></div></div>
 
-      <!-- Config -->
-      <div class="home-section">Configurações</div>
-      <div class="config-card" onclick="irPerfil()">
-        <div class="config-row">
-          <div>
-            <div class="config-label" id="cfg-nivel">IC</div>
-            <div style="font-size:11px;color:#aaa;" id="cfg-area">Ciência dos Materiais</div>
-          </div>
-          <div class="config-edit">Ver perfil →</div>
-        </div>
-      </div>
-
-      <div class="footer">CientistaDiário · v0.2</div>
-    </div>
-  </div>
-
-  <!-- ERRO -->
-  <div class="screen" id="s-erro">
-    <div class="erro-icon" id="erro-icon">😕</div>
-    <div class="erro-title" id="erro-title">Algo deu errado</div>
-    <div class="erro-desc" id="erro-desc">Não foi possível conectar com a IA. Verifique sua internet e tente novamente.</div>
-    <button class="btn btn-dark" id="erro-btn" onclick="erroTentar()">Tentar novamente →</button>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="show('s-home')">Voltar ao início</button>
-  </div>
-
-  <!-- PERFIL -->
-  <div class="screen" id="s-perfil">
-    <div class="perfil-header">
-      <div class="perfil-avatar" id="perf-avatar">?</div>
-      <div class="perfil-info">
-        <h2 id="perf-nome">—</h2>
-        <p id="perf-nivel-area">—</p>
-      </div>
-    </div>
-    <div class="perfil-body">
-      <div class="perfil-card">
-        <h3>Estatísticas</h3>
-        <div class="perfil-row"><span class="pr-label">Sessões completadas</span><span class="pr-value" id="perf-sessoes">0</span></div>
-        <div class="perfil-row"><span class="pr-label">Respostas certas</span><span class="pr-value" id="perf-acertos">0</span></div>
-        <div class="perfil-row"><span class="pr-label">Aproveitamento</span><span class="pr-value" id="perf-pct">0%</span></div>
-        <div class="perfil-row"><span class="pr-label">Maior sequência</span><span class="pr-value" id="perf-maior">0 dias</span></div>
-        <div class="perfil-row"><span class="pr-label">Badges conquistados</span><span class="pr-value" id="perf-badges">0</span></div>
-      </div>
-      <div class="perfil-card">
-        <h3>Projeto de pesquisa</h3>
-        <div style="font-size:14px;color:#555;line-height:1.6;" id="perf-projeto">—</div>
-      </div>
-      <button class="btn btn-dark" onclick="irEditarPerfil()">Editar perfil →</button>
-      <button class="btn btn-ghost" onclick="show('s-home')">Voltar</button>
-    </div>
-  </div>
-
-  <!-- LOADING -->
-  <div class="screen" id="s-loading">
-    <div class="loading-inner">
-      <div class="spinner"></div>
-      <p class="loading-msg" id="loading-msg">Aguarde...</p>
-    </div>
-  </div>
-
-  <!-- ARTIGO -->
-  <div class="screen" id="s-artigo">
-    <div class="art-header">
-      <h2>Artigo de hoje</h2>
-      <p id="art-nivel-area">—</p>
-    </div>
-    <div class="art-body">
-      <div class="art-card">
-        <span class="art-tag" id="art-tag">—</span>
-        <p class="art-title" id="art-titulo">—</p>
-        <p class="art-meta" id="art-meta">—</p>
-        <p class="art-query" id="art-query" style="display:none;"></p>
-        <a id="art-scholar" href="#" target="_blank" class="scholar-btn">🎓 Buscar no Google Acadêmico</a>
-      </div>
-      <div class="info-pill">📖 Leia o artigo antes de continuar</div>
-      <button class="btn btn-dark" onclick="irPerguntas()">Li o artigo — vamos às perguntas →</button>
-      <button class="btn btn-ghost" onclick="show('s-home')">Voltar ao início</button>
-    </div>
-  </div>
-
-  <!-- PERGUNTAS -->
-  <div class="screen" id="s-perguntas">
-    <div class="q-progress"><div class="q-progress-fill" id="prog" style="width:0%"></div></div>
-    <div class="q-header">
-      <span class="q-num" id="q-num">Pergunta 1 de 4</span>
-      <span class="q-nivel" id="q-nivel">IC</span>
-    </div>
-    <div class="q-text" id="q-text"></div>
-    <div id="opts"></div>
-    <div id="expl-box"></div>
-    <button class="btn btn-dark" id="btn-prox" style="display:none;margin-top:14px" onclick="proxima()">Próxima →</button>
-  </div>
-
-  <!-- RESULTADO -->
-  <div class="screen" id="s-resultado">
-    <div class="res-top">
-      <div class="res-icon" id="res-icon">🎉</div>
-      <div class="res-score" id="res-score">0/4</div>
-      <div class="res-sub">perguntas certas</div>
-    </div>
-    <div class="new-badge-card" id="new-badge">
-      <div class="nb-icon" id="nb-icon">🏅</div>
-      <div class="nb-title" id="nb-title">Badge conquistado!</div>
-      <div class="nb-desc" id="nb-desc"></div>
-    </div>
-    <div class="res-feedback" id="res-feedback"></div>
-    <div class="res-btns">
-      <button class="btn btn-dark" onclick="voltarHome()">Voltar ao início →</button>
-    </div>
-  </div>
-
+<div class="screen" id="s-erro"><div class="erro-icon">😕</div><div class="erro-title" id="erro-title">Algo deu errado</div><div class="erro-desc" id="erro-desc">Não foi possível conectar.</div><button class="btn btn-dark" onclick="erroTentar()">Tentar novamente →</button><button class="btn btn-ghost" style="margin-top:8px" onclick="voltarHome()">Voltar ao início</button></div>
 </div>
-
 <script>
-const API_KEY = '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';
-const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-
-// ── BADGES ────────────────────────────────────────────────
-const BADGES_DEF = [
-  { id:'first',    icon:'🌱', title:'Primeiro passo',  desc:'Completou a primeira sessão',    cond:p=>p.sessoes>=1 },
-  { id:'streak3',  icon:'🔥', title:'3 dias seguidos', desc:'3 dias de sequência',             cond:p=>p.streakAtual>=3 },
-  { id:'streak7',  icon:'⚡', title:'Uma semana!',     desc:'7 dias de sequência',             cond:p=>p.streakAtual>=7 },
-  { id:'streak30', icon:'🏆', title:'Mês científico',  desc:'30 dias de sequência',            cond:p=>p.streakAtual>=30 },
-  { id:'acc10',    icon:'🎯', title:'10 acertos',      desc:'Acumulou 10 respostas certas',    cond:p=>p.totalAcertos>=10 },
-  { id:'acc50',    icon:'💡', title:'50 acertos',      desc:'Acumulou 50 respostas certas',    cond:p=>p.totalAcertos>=50 },
-  { id:'perfect',  icon:'⭐', title:'Sessão perfeita', desc:'Acertou tudo em uma sessão',      cond:p=>p.sessoesPerfei>=1 },
-  { id:'sess10',   icon:'📚', title:'10 sessões',      desc:'Completou 10 sessões de estudo',  cond:p=>p.sessoes>=10 },
+const API_KEY='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';
+const API_URL='https://openrouter.ai/api/v1/chat/completions';
+const BADGES_DEF=[
+{id:'first',icon:'🌱',title:'Primeiro passo',desc:'Completou a primeira sessão',cond:p=>p.sessoes>=1},
+{id:'streak3',icon:'🔥',title:'3 dias seguidos',desc:'3 dias de sequência',cond:p=>p.streakAtual>=3},
+{id:'streak7',icon:'⚡',title:'Uma semana!',desc:'7 dias de sequência',cond:p=>p.streakAtual>=7},
+{id:'streak30',icon:'🏆',title:'Mês científico',desc:'30 dias de sequência',cond:p=>p.streakAtual>=30},
+{id:'artigos5',icon:'📖',title:'5 artigos',desc:'Leu 5 artigos',cond:p=>(p.biblioteca||[]).length>=5},
+{id:'acc10',icon:'🎯',title:'10 acertos',desc:'Acumulou 10 respostas certas',cond:p=>p.totalAcertos>=10},
+{id:'acc50',icon:'💡',title:'50 acertos',desc:'Acumulou 50 respostas certas',cond:p=>p.totalAcertos>=50},
+{id:'perfect',icon:'⭐',title:'Sessão perfeita',desc:'Acertou tudo em uma sessão',cond:p=>p.sessoesPerfei>=1},
 ];
+function loadProgress(){try{const r=localStorage.getItem('cd_progress');if(r)return JSON.parse(r);}catch(e){}return{sessoes:0,totalAcertos:0,totalPerguntas:0,streakAtual:0,maiorStreak:0,badges:[],sessoesPerfei:0,dias:[],biblioteca:[]};}
+function saveProgress(p){localStorage.setItem('cd_progress',JSON.stringify(p));}
+function loadPerfil(){try{const r=localStorage.getItem('cd_perfil');if(r)return JSON.parse(r);}catch(e){}return null;}
+function savePerfil(p){localStorage.setItem('cd_perfil',JSON.stringify(p));}
+function hoje(){return new Date().toISOString().slice(0,10);}
+function hojeBR(){return new Date().toLocaleDateString('pt-BR');}
+function atualizarStreak(p){const d=hoje();if(p.dias.includes(d))return;p.dias.push(d);if(p.dias.length>60)p.dias=p.dias.slice(-60);const ontem=new Date(Date.now()-86400000).toISOString().slice(0,10);p.streakAtual=p.dias.includes(ontem)?p.streakAtual+1:1;if(p.streakAtual>p.maiorStreak)p.maiorStreak=p.streakAtual;}
+function checarBadges(p){const novos=[];for(const b of BADGES_DEF){if(!p.badges.includes(b.id)&&b.cond(p)){p.badges.push(b.id);novos.push(b);}}return novos;}
 
-// ── STORAGE ───────────────────────────────────────────────
-function loadProgress() {
-  try { const r=localStorage.getItem('cd_progress'); if(r) return JSON.parse(r); } catch(e){}
-  return {sessoes:0,totalAcertos:0,totalPerguntas:0,streakAtual:0,maiorStreak:0,badges:[],sessoesPerfei:0,dias:[]};
-}
-function saveProgress(p) { localStorage.setItem('cd_progress',JSON.stringify(p)); }
-function loadPerfil() {
-  try { const r=localStorage.getItem('cd_perfil'); if(r) return JSON.parse(r); } catch(e){}
-  return null;
-}
-function savePerfil(p) { localStorage.setItem('cd_perfil',JSON.stringify(p)); }
-function hoje() { return new Date().toISOString().slice(0,10); }
-
-function atualizarStreak(p) {
-  const d=hoje();
-  if(p.dias.includes(d)) return;
-  p.dias.push(d);
-  if(p.dias.length>60) p.dias=p.dias.slice(-60);
-  const ontem=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  p.streakAtual = p.dias.includes(ontem) ? p.streakAtual+1 : 1;
-  if(p.streakAtual>p.maiorStreak) p.maiorStreak=p.streakAtual;
-}
-function checarBadges(p) {
-  const novos=[];
-  for(const b of BADGES_DEF) { if(!p.badges.includes(b.id)&&b.cond(p)){p.badges.push(b.id);novos.push(b);} }
-  return novos;
-}
-
-// ── RENDER HOME ───────────────────────────────────────────
-function renderHome() {
-  const p=loadProgress(), perf=loadPerfil();
-  if(perf) {
-    document.getElementById('home-nome').textContent = perf.nome || 'Pesquisador';
-    document.getElementById('cfg-nivel').textContent = perf.nivel || 'IC';
-    document.getElementById('cfg-area').textContent = perf.areaNome || '';
-    document.getElementById('home-sessao-desc').textContent = perf.projeto ? '"' + perf.projeto.substring(0,80) + (perf.projeto.length>80?'…':'') + '"' : 'A IA vai sugerir um artigo baseado no seu projeto.';
-  }
-  document.getElementById('home-streak-num').textContent = p.streakAtual+'🔥';
-  document.getElementById('home-streak-lbl').textContent = p.streakAtual===1?'dia de sequência':'dias de sequência';
-  document.getElementById('h-sessoes').textContent = p.sessoes;
-  const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
-  document.getElementById('h-pct').textContent = pct+'%';
-  document.getElementById('h-acertos').textContent = p.totalAcertos;
-  document.getElementById('h-maior').textContent = p.maiorStreak;
-
-  // calendário
-  const cal=document.getElementById('h-calendar'); cal.innerHTML='';
-  // alinhar com dia da semana
-  const todayDate=new Date(); const todayStr=hoje();
-  const startDate=new Date(todayDate); startDate.setDate(startDate.getDate()-27);
-  const startDow=startDate.getDay(); // 0=dom
-  for(let i=0;i<startDow;i++){const e=document.createElement('div');cal.appendChild(e);}
-  for(let i=27;i>=0;i--){
-    const d=new Date(Date.now()-i*86400000).toISOString().slice(0,10);
-    const el=document.createElement('div');
-    el.className='cal-cell'+(p.dias.includes(d)?' done':'')+(d===todayStr?' today':'');
-    cal.appendChild(el);
-  }
-
-  // badges
-  const bg=document.getElementById('h-badges'); bg.innerHTML='';
-  for(const b of BADGES_DEF){
-    const el=document.createElement('div');
-    el.className='badge-card'+(p.badges.includes(b.id)?'':' locked');
-    el.innerHTML='<div class="bi">'+b.icon+'</div><div><div class="bt">'+b.title+'</div><div class="bd">'+b.desc+'</div></div>';
-    bg.appendChild(el);
-  }
-
-  // Banner já estudou hoje
-  const jaEstudou=p.dias.includes(hoje());
-  const banner=document.getElementById('studied-banner');
-  const card=document.getElementById('session-card');
-  const btn=document.getElementById('session-btn');
-  if(jaEstudou){
-    banner.style.display='flex';
-    document.getElementById('studied-sub').textContent='Streak atual: '+p.streakAtual+'🔥 — volte amanhã!';
-    card.classList.add('done');
-    card.onclick=null;
-    btn.textContent='Concluído hoje ✓';
-  } else {
-    banner.style.display='none';
-    card.classList.remove('done');
-    card.onclick=iniciarSessao;
-    btn.textContent='Iniciar agora →';
-  }
+function renderHome(){
+const p=loadProgress(),perf=loadPerfil();
+if(perf){document.getElementById('home-nome').textContent=perf.nome||'Pesquisador';document.getElementById('home-sessao-desc').textContent=perf.projeto?'"'+perf.projeto.substring(0,80)+(perf.projeto.length>80?'…':'')+'"':'A IA vai buscar um artigo da sua área.';}
+document.getElementById('home-streak-num').textContent=p.streakAtual+'🔥';
+document.getElementById('home-streak-lbl').textContent=p.streakAtual===1?'dia de sequência':'dias de sequência';
+document.getElementById('h-sessoes').textContent=p.sessoes;
+const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
+document.getElementById('h-pct').textContent=pct+'%';
+document.getElementById('h-acertos').textContent=p.totalAcertos;
+document.getElementById('h-maior').textContent=p.maiorStreak;
+const cal=document.getElementById('h-calendar');cal.innerHTML='';
+const todayStr=hoje();const startDate=new Date();startDate.setDate(startDate.getDate()-27);
+for(let i=0;i<startDate.getDay();i++){cal.appendChild(document.createElement('div'));}
+for(let i=27;i>=0;i--){const d=new Date(Date.now()-i*86400000).toISOString().slice(0,10);const el=document.createElement('div');el.className='cal-cell'+(p.dias.includes(d)?' done':'')+(d===todayStr?' today':'');cal.appendChild(el);}
+const bg=document.getElementById('h-badges');bg.innerHTML='';
+for(const b of BADGES_DEF){const el=document.createElement('div');el.className='badge-card'+(p.badges.includes(b.id)?'':' locked');el.innerHTML='<div class="bi">'+b.icon+'</div><div><div class="bt">'+b.title+'</div><div class="bd">'+b.desc+'</div></div>';bg.appendChild(el);}
+const jaEstudou=p.dias.includes(hoje());
+const banner=document.getElementById('studied-banner'),card=document.getElementById('session-card'),btn=document.getElementById('session-btn');
+if(jaEstudou){banner.style.display='flex';document.getElementById('studied-sub').textContent='Streak: '+p.streakAtual+'🔥 — volte amanhã!';card.classList.add('done');card.onclick=null;btn.textContent='Concluído hoje ✓';}
+else{banner.style.display='none';card.classList.remove('done');card.onclick=iniciarSessao;btn.textContent='Iniciar agora →';}
 }
 
-// ── ONBOARDING ────────────────────────────────────────────
+function renderBiblioteca(){
+const p=loadProgress();const bib=p.biblioteca||[];
+const body=document.getElementById('bib-body');
+document.getElementById('bib-count').textContent=bib.length+(bib.length===1?' artigo estudado':' artigos estudados');
+if(bib.length===0){body.innerHTML='<div class="bib-empty"><div class="be-icon">📚</div><p>Você ainda não estudou nenhum artigo.<br>Complete sua primeira sessão para começar sua biblioteca!</p></div>';return;}
+body.innerHTML='';
+bib.slice().reverse().forEach(function(item,idx){
+const div=document.createElement('div');div.className='bib-item';
+const scoreCls=item.pct>=50?'good':'';
+div.innerHTML='<div class="bi-date">'+item.data+'</div><div class="bi-title">'+item.titulo+'</div><div class="bi-authors">'+item.autores+'</div><div class="bi-resumo" id="bib-res-'+idx+'">'+item.resumo+'</div><span class="bi-toggle" onclick="toggleResumo('+idx+')">Ler resumo ▾</span><br><span class="bi-score '+scoreCls+'">✓ '+item.acertos+'/'+item.total+' na sessão</span>'+(item.scholar?'<a href="'+item.scholar+'" target="_blank" class="bi-scholar">🎓 Ver artigo completo</a>':'');
+body.appendChild(div);
+});
+}
+function toggleResumo(idx){const el=document.getElementById('bib-res-'+idx);el.classList.toggle('open');const tog=el.nextElementSibling;tog.textContent=el.classList.contains('open')?'Ocultar resumo ▴':'Ler resumo ▾';}
+
+function renderPerfil(){
+const perf=loadPerfil()||{};const p=loadProgress();
+document.getElementById('perf-avatar').textContent=(perf.nome||'?')[0].toUpperCase();
+document.getElementById('perf-nome').textContent=perf.nome||'Pesquisador';
+document.getElementById('perf-nivel-area').textContent=(perf.nivel||'IC')+' · '+(perf.areaNome||'');
+document.getElementById('perf-sessoes').textContent=p.sessoes;
+document.getElementById('perf-artigos').textContent=(p.biblioteca||[]).length;
+document.getElementById('perf-acertos').textContent=p.totalAcertos;
+const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
+document.getElementById('perf-pct').textContent=pct+'%';
+document.getElementById('perf-maior').textContent=p.maiorStreak+' dias';
+document.getElementById('perf-badges').textContent=p.badges.length+'/'+BADGES_DEF.length;
+document.getElementById('perf-projeto').textContent=perf.projeto||'Nenhum projeto descrito.';
+}
+
+function navTab(id,el){
+show(id);
+if(id==='s-home')renderHome();
+if(id==='s-biblioteca')renderBiblioteca();
+if(id==='s-perfil')renderPerfil();
+}
+
 let obSlide=0;
-function obNext() {
-  if(obSlide<2) {
-    document.getElementById('ob'+obSlide).classList.remove('active');
-    document.getElementById('ob'+obSlide).classList.add('prev');
-    document.getElementById('dot'+obSlide).classList.remove('active');
-    obSlide++;
-    document.getElementById('ob'+obSlide).classList.add('active');
-    document.getElementById('dot'+obSlide).classList.add('active');
-    if(obSlide===2) document.getElementById('ob-btn').textContent='Começar →';
-  } else {
-    irCadastro();
-  }
-}
-function irCadastro() { show('s-cadastro'); }
-
-// ── CADASTRO ──────────────────────────────────────────────
+function obNext(){if(obSlide<2){document.getElementById('ob'+obSlide).classList.remove('active');document.getElementById('ob'+obSlide).classList.add('prev');document.getElementById('dot'+obSlide).classList.remove('active');obSlide++;document.getElementById('ob'+obSlide).classList.add('active');document.getElementById('dot'+obSlide).classList.add('active');if(obSlide===2)document.getElementById('ob-btn').textContent='Começar →';}else{irCadastro();}}
+function irCadastro(){show('s-cadastro');}
 let nivelAtual='IC';
-function selecionarNivel(nivel,el) {
-  nivelAtual=nivel;
-  document.querySelectorAll('.nivel-pill').forEach(p=>p.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
-function salvarCadastro() {
-  const nome=document.getElementById('cad-nome').value.trim();
-  if(!nome){document.getElementById('err-cad').textContent='Digite seu nome para continuar.';return;}
-  const areaEl=document.getElementById('cad-area');
-  const areaNome=areaEl.options[areaEl.selectedIndex].text;
-  const projeto=document.getElementById('cad-projeto').value.trim();
-  savePerfil({nome, nivel:nivelAtual, area:areaEl.value, areaNome, projeto});
-  localStorage.setItem('cd_onboarding','done');
-  renderHome();
-  show('s-home');
-}
-
-function irEditarPerfil() {
-  const perf=loadPerfil();
-  if(perf){
-    document.getElementById('cad-nome').value=perf.nome||'';
-    document.getElementById('cad-area').value=perf.area||'materiais';
-    document.getElementById('cad-projeto').value=perf.projeto||'';
-    nivelAtual=perf.nivel||'IC';
-    document.querySelectorAll('.nivel-pill').forEach(p=>{
-      p.classList.toggle('selected', p.textContent===nivelAtual);
-    });
-  }
-  show('s-cadastro');
-}
-
-// ── NAVEGAÇÃO ─────────────────────────────────────────────
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-function setLoading(msg) { document.getElementById('loading-msg').textContent=msg; show('s-loading'); }
-
-// ── IA ────────────────────────────────────────────────────
-async function chamarIA(prompt) {
-  const resp=await fetch(API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY,'HTTP-Referer':window.location.href},
-    body:JSON.stringify({model:'openrouter/auto',messages:[{role:'user',content:prompt}],max_tokens:1200})
-  });
-  if(!resp.ok) throw new Error('Erro na API: '+resp.status);
-  const data=await resp.json();
-  return data.choices[0].message.content;
-}
-
-function gerarQueryScholar(texto) {
-  const stop=['de','do','da','dos','das','em','no','na','nos','nas','para','com','por','que','um','uma','o','a','os','as','e','é','ao','se','sobre','como','foi','ser','estudo','análise','pesquisa'];
-  return texto.toLowerCase().replace(/[^\w\sáàãâéêíóôõúüç]/g,' ').split(/\s+/).filter(p=>p.length>2&&!stop.includes(p)).slice(0,6).join(' ');
-}
-
-// ── FLUXO SESSÃO ──────────────────────────────────────────
-let estado={artigo:null,perguntas:[],qAtual:0,acertos:0};
-
-async function iniciarSessao() {
-  const perf=loadPerfil();
-  if(!perf){show('s-cadastro');return;}
-  setLoading('A IA está buscando um artigo para o seu projeto...');
-  try {
-    const areaEl=document.getElementById('cad-area');
-    const areaNome=perf.areaNome||'Ciência dos Materiais';
-    const projetoInfo=perf.projeto?'O projeto de pesquisa do estudante é: "'+perf.projeto+'".':`Área: ${areaNome}.`;
-    const txt=await chamarIA(`Você é um orientador acadêmico. ${projetoInfo} Sugira UM artigo científico real e existente para um estudante de ${perf.nivel} em ${areaNome}. Responda APENAS com JSON válido, sem markdown: {"titulo":"título do artigo","autores":"Autor et al. (ano)","resumo":"2 frases em português","query_scholar":"3-5 palavras-chave"}`);
-    const artigo=JSON.parse(txt.replace(/```json|```/g,'').trim());
-    estado.artigo=artigo;
-    document.getElementById('art-tag').textContent=areaNome+' · '+perf.nivel;
-    document.getElementById('art-nivel-area').textContent=areaNome+' · '+perf.nivel;
-    document.getElementById('art-titulo').textContent=artigo.titulo;
-    document.getElementById('art-meta').textContent=artigo.autores+' — '+artigo.resumo;
-    const query=artigo.query_scholar||gerarQueryScholar(artigo.titulo);
-    document.getElementById('art-scholar').href='https://scholar.google.com/scholar?q='+encodeURIComponent(query)+'&hl=pt-BR';
-    const aq=document.getElementById('art-query');
-    aq.style.display='block'; aq.textContent='🔍 Busca: "'+query+'"';
-    show('s-artigo');
-  } catch(e) { mostrarErro('Erro ao buscar artigo', 'Não foi possível conectar com a IA. Verifique sua internet e tente novamente.', iniciarSessao); }
-}
-
-async function irPerguntas() {
-  const perf=loadPerfil()||{nivel:'IC'};
-  setLoading('Gerando perguntas personalizadas para o seu nível...');
-  try {
-    const txt=await chamarIA(`Crie exatamente 4 perguntas de múltipla escolha em português para um estudante de ${perf.nivel} sobre o artigo "${estado.artigo.titulo}". REGRAS: responda APENAS com um array JSON puro, sem texto antes, sem texto depois, sem markdown, sem backticks. Dificuldade: IC=compreensão básica, Mestrado=análise crítica, Doutorado=síntese avançada. FORMATO EXATO: [{"pergunta":"texto da pergunta aqui","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação curta"}] O campo correta é o índice 0-3 da opção correta.`);
-    const clean=txt.replace(/```json|```/g,'').trim();
-    const match=clean.match(/\[[\s\S]*\]/);
-    let parsed=null;
-    try{parsed=JSON.parse(clean);}catch(e){}
-    if(!Array.isArray(parsed)){try{parsed=JSON.parse(match?match[0]:'[]');}catch(e){}}
-    if(!Array.isArray(parsed)||parsed.length===0) throw new Error('JSON inválido');
-    estado.perguntas=parsed; estado.qAtual=0; estado.acertos=0;
-    showQ(); show('s-perguntas');
-  } catch(e) { mostrarErro('Erro ao gerar perguntas', 'A IA não conseguiu gerar as perguntas. Tente novamente ou volte ao artigo.', irPerguntas); }
-}
-
-function showQ() {
-  const q=estado.perguntas[estado.qAtual], total=estado.perguntas.length;
-  const perf=loadPerfil()||{nivel:'IC'};
-  document.getElementById('prog').style.width=(estado.qAtual/total*100)+'%';
-  document.getElementById('q-num').textContent='Pergunta '+(estado.qAtual+1)+' de '+total;
-  document.getElementById('q-nivel').textContent=perf.nivel;
-  document.getElementById('q-text').textContent=q.pergunta;
-  document.getElementById('expl-box').innerHTML='';
-  document.getElementById('btn-prox').style.display='none';
-  const opts=document.getElementById('opts'); opts.innerHTML='';
-  q.opcoes.forEach(function(op,i){
-    const b=document.createElement('button');
-    b.className='option'; b.textContent=op;
-    b.onclick=function(){responder(i,b);};
-    opts.appendChild(b);
-  });
-}
-
-function responder(idx,btn) {
-  const q=estado.perguntas[estado.qAtual];
-  document.querySelectorAll('.option').forEach(function(b){b.onclick=null;});
-  if(idx===q.correta){btn.classList.add('correct');estado.acertos++;}
-  else{btn.classList.add('wrong');document.querySelectorAll('.option')[q.correta].classList.add('correct');}
-  const expl=document.createElement('div');
-  expl.className='expl'; expl.textContent=q.explicacao;
-  document.getElementById('expl-box').appendChild(expl);
-  document.getElementById('btn-prox').style.display='block';
-}
-
-function proxima() {
-  estado.qAtual++;
-  if(estado.qAtual<estado.perguntas.length) showQ();
-  else mostrarResultado();
-}
-
-async function mostrarResultado() {
-  const ac=estado.acertos, tot=estado.perguntas.length, pct=ac/tot;
-  const p=loadProgress();
-  atualizarStreak(p); p.sessoes++; p.totalAcertos+=ac; p.totalPerguntas+=tot;
-  if(pct===1) p.sessoesPerfei=(p.sessoesPerfei||0)+1;
-  const novoBadges=checarBadges(p); saveProgress(p);
-  document.getElementById('res-icon').textContent=pct===1?'🏆':pct>=0.5?'🎯':'📚';
-  document.getElementById('res-score').textContent=ac+'/'+tot;
-  document.getElementById('prog').style.width='100%';
-  if(novoBadges.length>0){
-    const b=novoBadges[0];
-    document.getElementById('nb-icon').textContent=b.icon;
-    document.getElementById('nb-title').textContent=b.title;
-    document.getElementById('nb-desc').textContent=b.desc;
-    document.getElementById('new-badge').style.display='block';
-  } else { document.getElementById('new-badge').style.display='none'; }
-  setLoading('Preparando seu feedback...');
-  try {
-    const feedback=await chamarIA(`Estudante acertou ${ac} de ${tot} perguntas sobre "${estado.artigo.titulo}". Dê um feedback motivador em 2-3 frases em português.`);
-    document.getElementById('res-feedback').textContent=feedback;
-  } catch(e) {
-    document.getElementById('res-feedback').textContent=pct===1?'Sessão perfeita! Excelente!':pct>=0.5?'Bom desempenho! Continue praticando.':'Continue tentando! A prática diária constrói expertise.';
-  }
-  show('s-resultado');
-}
-
-function voltarHome() { renderHome(); show('s-home'); }
-
-// ── ERRO ──────────────────────────────────────────────────
+function selecionarNivel(nivel,el){nivelAtual=nivel;document.querySelectorAll('.nivel-pill').forEach(p=>p.classList.remove('selected'));el.classList.add('selected');}
+function salvarCadastro(){const nome=document.getElementById('cad-nome').value.trim();if(!nome){document.getElementById('err-cad').textContent='Digite seu nome para continuar.';return;}const areaEl=document.getElementById('cad-area');savePerfil({nome,nivel:nivelAtual,area:areaEl.value,areaNome:areaEl.options[areaEl.selectedIndex].text,projeto:document.getElementById('cad-projeto').value.trim()});localStorage.setItem('cd_onboarding','done');renderHome();show('s-home');}
+function irEditarPerfil(){const perf=loadPerfil();if(perf){document.getElementById('cad-nome').value=perf.nome||'';document.getElementById('cad-area').value=perf.area||'materiais';document.getElementById('cad-projeto').value=perf.projeto||'';nivelAtual=perf.nivel||'IC';document.querySelectorAll('.nivel-pill').forEach(p=>{p.classList.toggle('selected',p.textContent===nivelAtual);});}show('s-cadastro');}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function setLoading(msg){document.getElementById('loading-msg').textContent=msg;show('s-loading');}
+function voltarHome(){renderHome();show('s-home');}
 let erroCallback=null;
-function mostrarErro(titulo, desc, callback) {
-  document.getElementById('erro-title').textContent=titulo;
-  document.getElementById('erro-desc').textContent=desc;
-  erroCallback=callback;
-  show('s-erro');
-}
-function erroTentar() { if(erroCallback) erroCallback(); }
+function mostrarErro(t,d,cb){document.getElementById('erro-title').textContent=t;document.getElementById('erro-desc').textContent=d;erroCallback=cb;show('s-erro');}
+function erroTentar(){if(erroCallback)erroCallback();}
 
-// ── PERFIL ────────────────────────────────────────────────
-function irPerfil() {
-  const perf=loadPerfil()||{};
-  const p=loadProgress();
-  const inicial=(perf.nome||'?')[0].toUpperCase();
-  document.getElementById('perf-avatar').textContent=inicial;
-  document.getElementById('perf-nome').textContent=perf.nome||'Pesquisador';
-  document.getElementById('perf-nivel-area').textContent=(perf.nivel||'IC')+' · '+(perf.areaNome||'');
-  document.getElementById('perf-sessoes').textContent=p.sessoes;
-  document.getElementById('perf-acertos').textContent=p.totalAcertos;
-  const pct=p.totalPerguntas>0?Math.round(p.totalAcertos/p.totalPerguntas*100):0;
-  document.getElementById('perf-pct').textContent=pct+'%';
-  document.getElementById('perf-maior').textContent=p.maiorStreak+' dias';
-  document.getElementById('perf-badges').textContent=p.badges.length+'/'+BADGES_DEF.length;
-  document.getElementById('perf-projeto').textContent=perf.projeto||'Nenhum projeto descrito.';
-  show('s-perfil');
-}
+async function chamarIA(prompt){const resp=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+API_KEY,'HTTP-Referer':window.location.href},body:JSON.stringify({model:'meta-llama/llama-3.1-8b-instruct:free',messages:[{role:'user',content:prompt}],max_tokens:1400})});if(!resp.ok)throw new Error('API '+resp.status);const data=await resp.json();return data.choices[0].message.content;}
 
-// ── INICIALIZAÇÃO ─────────────────────────────────────────
-function init() {
-  const onboardingFeito=localStorage.getItem('cd_onboarding');
-  const perfil=loadPerfil();
-  show('s-splash');
-  setTimeout(function(){
-    if(!onboardingFeito||!perfil) { show('s-onboarding'); }
-    else { renderHome(); show('s-home'); }
-  }, 2000);
+// OpenAlex - reconstruir abstract do inverted index
+function reconstruirAbstract(inv){if(!inv)return null;const palavras=[];for(const[palavra,posicoes]of Object.entries(inv)){for(const pos of posicoes){palavras[pos]=palavra;}}return palavras.join(' ');}
+
+async function buscarArtigoOpenAlex(query){
+try{
+const url='https://api.openalex.org/works?search='+encodeURIComponent(query)+'&filter=has_abstract:true&sort=relevance_score:desc&per_page=5';
+const resp=await fetch(url);
+if(!resp.ok)return null;
+const data=await resp.json();
+if(!data.results||data.results.length===0)return null;
+// pegar um artigo recente com abstract
+for(const w of data.results){
+const abs=reconstruirAbstract(w.abstract_inverted_index);
+if(abs&&abs.length>150){
+const autores=(w.authorships||[]).slice(0,3).map(a=>a.author.display_name).join(', ')+(w.authorships.length>3?' et al.':'');
+return{titulo:w.title,autores:autores+' ('+(w.publication_year||'')+')',abstract:abs,ano:w.publication_year,doi:w.doi,scholar:'https://scholar.google.com/scholar?q='+encodeURIComponent(w.title)+'&hl=pt-BR'};
+}
+}
+return null;
+}catch(e){return null;}
 }
 
+let estado={artigo:null,perguntas:[],qAtual:0,acertos:0,resumoPT:''};
+
+async function iniciarSessao(){
+const perf=loadPerfil();if(!perf){show('s-cadastro');return;}
+setLoading('Buscando um artigo recente da sua área...');
+try{
+// 1. Gerar query de busca a partir do projeto
+const areaNome=perf.areaNome||'Ciência dos Materiais';
+const baseQuery=perf.projeto||areaNome;
+// 2. Buscar artigo real no OpenAlex
+let artigo=await buscarArtigoOpenAlex(baseQuery);
+let fonteAbstract='';
+if(artigo){
+// Traduzir/resumir o abstract real em português
+setLoading('Preparando o resumo do artigo...');
+try{
+const resumoPT=await chamarIA(`Traduza e resuma em português, de forma clara e estruturada (4-6 frases), o seguinte abstract de um artigo científico. Mantenha os termos técnicos. Abstract: "${artigo.abstract.substring(0,1500)}"`);
+estado.resumoPT=resumoPT.trim();
+fonteAbstract='Resumo baseado no abstract original (OpenAlex)';
+}catch(e){estado.resumoPT=artigo.abstract.substring(0,600);fonteAbstract='Abstract original (OpenAlex)';}
+}else{
+// Fallback: IA gera artigo + resumo
+setLoading('Gerando resumo do artigo...');
+const projetoInfo=perf.projeto?'Projeto: "'+perf.projeto+'".':`Área: ${areaNome}.`;
+const txt=await chamarIA(`Você é um orientador. ${projetoInfo} Sugira UM artigo científico real de ${areaNome} para nível ${perf.nivel}. Responda APENAS JSON: {"titulo":"título","autores":"Autor et al. (ano)","resumo":"resumo estruturado em 4-6 frases em português"}`);
+const obj=JSON.parse(txt.replace(/\`\`\`json|\`\`\`/g,'').trim());
+artigo={titulo:obj.titulo,autores:obj.autores,scholar:'https://scholar.google.com/scholar?q='+encodeURIComponent(obj.titulo)+'&hl=pt-BR'};
+estado.resumoPT=obj.resumo;
+fonteAbstract='Resumo gerado por IA';
+}
+estado.artigo=artigo;
+document.getElementById('art-tag').textContent=areaNome+' · '+perf.nivel;
+document.getElementById('art-nivel-area').textContent=areaNome+' · '+perf.nivel;
+document.getElementById('art-titulo').textContent=artigo.titulo;
+document.getElementById('art-authors').textContent=artigo.autores;
+document.getElementById('art-resumo').textContent=estado.resumoPT;
+document.getElementById('art-source').textContent=fonteAbstract;
+document.getElementById('art-scholar').href=artigo.scholar;
+show('s-artigo');
+}catch(e){mostrarErro('Erro ao buscar artigo','Não foi possível buscar o artigo. Verifique sua internet e tente novamente.',iniciarSessao);}
+}
+
+async function irPerguntas(){
+const perf=loadPerfil()||{nivel:'IC'};
+setLoading('Gerando perguntas sobre o resumo...');
+try{
+const txt=await chamarIA(`Com base APENAS neste resumo de artigo científico, crie exatamente 5 perguntas de múltipla escolha em português para um estudante de ${perf.nivel}. As perguntas devem testar a compreensão do resumo. RESUMO: "${estado.resumoPT}". REGRAS: responda APENAS com array JSON puro, sem markdown, sem texto extra. FORMATO: [{"pergunta":"texto","opcoes":["A","B","C","D"],"correta":0,"explicacao":"explicação breve"}]`);
+const clean=txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
+const match=clean.match(/\[[\s\S]*\]/);
+let parsed=null;
+try{parsed=JSON.parse(clean);}catch(e){}
+if(!Array.isArray(parsed)){try{parsed=JSON.parse(match?match[0]:'[]');}catch(e){}}
+if(!Array.isArray(parsed)||parsed.length===0)throw new Error('inv');
+estado.perguntas=parsed;estado.qAtual=0;estado.acertos=0;
+showQ();show('s-perguntas');
+}catch(e){mostrarErro('Erro ao gerar perguntas','Tente novamente.',irPerguntas);}
+}
+
+function showQ(){
+const q=estado.perguntas[estado.qAtual],total=estado.perguntas.length;
+const perf=loadPerfil()||{nivel:'IC'};
+document.getElementById('prog').style.width=(estado.qAtual/total*100)+'%';
+document.getElementById('q-num').textContent='Pergunta '+(estado.qAtual+1)+' de '+total;
+document.getElementById('q-nivel').textContent=perf.nivel;
+document.getElementById('q-text').textContent=q.pergunta;
+document.getElementById('expl-box').innerHTML='';
+document.getElementById('btn-prox').style.display='none';
+const opts=document.getElementById('opts');opts.innerHTML='';
+q.opcoes.forEach(function(op,i){const b=document.createElement('button');b.className='option';b.textContent=op;b.onclick=function(){responder(i,b);};opts.appendChild(b);});
+}
+function responder(idx,btn){
+const q=estado.perguntas[estado.qAtual];
+document.querySelectorAll('.option').forEach(b=>b.onclick=null);
+if(idx===q.correta){btn.classList.add('correct');estado.acertos++;}else{btn.classList.add('wrong');document.querySelectorAll('.option')[q.correta].classList.add('correct');}
+const expl=document.createElement('div');expl.className='expl';expl.textContent=q.explicacao;document.getElementById('expl-box').appendChild(expl);
+document.getElementById('btn-prox').style.display='block';
+}
+function proxima(){estado.qAtual++;if(estado.qAtual<estado.perguntas.length)showQ();else mostrarResultado();}
+
+async function mostrarResultado(){
+const ac=estado.acertos,tot=estado.perguntas.length,pct=Math.round(ac/tot*100);
+const aprovado=pct>50;
+document.getElementById('res-icon').textContent=pct===100?'🏆':aprovado?'🎯':'📚';
+document.getElementById('res-score').textContent=ac+'/'+tot;
+document.getElementById('prog').style.width='100%';
+const statusEl=document.getElementById('res-status');
+const btnsEl=document.getElementById('res-btns');
+if(aprovado){
+statusEl.className='res-status aprovado';
+statusEl.textContent='✅ Sessão concluída! Você acertou '+pct+'%';
+// Salvar progresso só se aprovado
+const p=loadProgress();
+atualizarStreak(p);p.sessoes++;p.totalAcertos+=ac;p.totalPerguntas+=tot;
+if(pct===100)p.sessoesPerfei=(p.sessoesPerfei||0)+1;
+if(!p.biblioteca)p.biblioteca=[];
+p.biblioteca.push({titulo:estado.artigo.titulo,autores:estado.artigo.autores,resumo:estado.resumoPT,data:hojeBR(),acertos:ac,total:tot,pct:pct,scholar:estado.artigo.scholar});
+const novoBadges=checarBadges(p);saveProgress(p);
+if(novoBadges.length>0){const b=novoBadges[0];document.getElementById('nb-icon').textContent=b.icon;document.getElementById('nb-title').textContent=b.title;document.getElementById('nb-desc').textContent=b.desc;document.getElementById('new-badge').style.display='block';}else{document.getElementById('new-badge').style.display='none';}
+btnsEl.innerHTML='<button class="btn btn-dark" onclick="voltarHome()">Voltar ao início →</button>';
+}else{
+statusEl.className='res-status reprovado';
+statusEl.textContent='📚 Você acertou '+pct+'%. Precisa de mais de 50% para concluir.';
+document.getElementById('new-badge').style.display='none';
+btnsEl.innerHTML='<button class="btn btn-blue" onclick="show(\'s-artigo\')">Reler o resumo →</button><button class="btn btn-dark" onclick="irPerguntas()">Tentar as perguntas de novo</button><button class="btn btn-ghost" onclick="voltarHome()">Voltar ao início</button>';
+}
+setLoading('Preparando seu feedback...');
+try{
+const feedback=await chamarIA(`Estudante acertou ${ac} de ${tot} perguntas (${pct}%) sobre um artigo. ${aprovado?'Foi aprovado.':'Não atingiu 50%.'} Dê feedback ${aprovado?'motivador':'encorajador para tentar de novo'} em 2 frases em português.`);
+document.getElementById('res-feedback').textContent=feedback;
+}catch(e){document.getElementById('res-feedback').textContent=aprovado?'Bom trabalho! Continue assim.':'Releia o resumo com atenção e tente novamente. Você consegue!';}
+show('s-resultado');
+}
+
+function init(){show('s-splash');setTimeout(function(){const onb=localStorage.getItem('cd_onboarding');const perf=loadPerfil();if(!onb||!perf){show('s-onboarding');}else{renderHome();show('s-home');}},2000);}
 init();
 </script>
 </body>
