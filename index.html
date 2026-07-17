@@ -396,7 +396,7 @@ if(artigo){
 // Traduzir/resumir o abstract real em português
 setLoading('Preparando o resumo do artigo...');
 try{
-const resumoPT=await chamarIA(`Traduza e resuma em português, de forma clara e estruturada (4-6 frases), o seguinte abstract de um artigo científico. Mantenha os termos técnicos. Abstract: "${artigo.abstract.substring(0,1500)}"`);
+const resumoPT=await chamarIA(`Traduza para o PORTUGUÊS e resuma de forma clara e estruturada (4-6 frases) o abstract abaixo. IMPORTANTE: a resposta deve estar 100% em português brasileiro, independente do idioma original do abstract. Mantenha os termos técnicos. Não escreva nada além do resumo em português. Abstract: "${artigo.abstract.substring(0,1500)}"`);
 estado.resumoPT=resumoPT.trim();
 fonteAbstract='Resumo baseado no abstract original (OpenAlex)';
 }catch(e){estado.resumoPT=artigo.abstract.substring(0,600);fonteAbstract='Abstract original (OpenAlex)';}
@@ -426,16 +426,21 @@ async function irPerguntas(){
 const perf=loadPerfil()||{nivel:'IC'};
 setLoading('Gerando perguntas sobre o resumo...');
 try{
-const txt=await chamarIA(`Com base APENAS neste resumo de artigo científico, crie exatamente 5 perguntas de múltipla escolha em português para um estudante de ${perf.nivel}. As perguntas devem testar a compreensão do resumo. RESUMO: "${estado.resumoPT}". REGRAS: responda APENAS com array JSON puro, sem markdown, sem texto extra. FORMATO: [{"pergunta":"texto","opcoes":["A","B","C","D"],"correta":0,"explicacao":"explicação breve"}]`);
-const clean=txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
-const match=clean.match(/\[[\s\S]*\]/);
 let parsed=null;
-try{parsed=JSON.parse(clean);}catch(e){}
-if(!Array.isArray(parsed)){try{parsed=JSON.parse(match?match[0]:'[]');}catch(e){}}
-if(!Array.isArray(parsed)||parsed.length===0)throw new Error('inv');
+// Tenta até 2 vezes
+for(let tentativa=0;tentativa<2&&!parsed;tentativa++){
+const txt=await chamarIA(`Com base APENAS neste resumo de artigo científico, crie exatamente 5 perguntas de múltipla escolha em português para um estudante de ${perf.nivel}. As perguntas devem testar a compreensão do resumo. RESUMO: "${estado.resumoPT}". REGRAS OBRIGATÓRIAS: responda SOMENTE com um array JSON válido. Sem markdown, sem backticks, sem texto antes ou depois. Cada objeto deve ter exatamente estes campos. FORMATO: [{"pergunta":"texto da pergunta","opcoes":["opção A","opção B","opção C","opção D"],"correta":0,"explicacao":"explicação breve"}]`);
+let clean=txt.replace(/\`\`\`json|\`\`\`/g,'').trim();
+const match=clean.match(/\[[\s\S]*\]/);
+if(match)clean=match[0];
+// Tentar corrigir vírgulas finais comuns
+clean=clean.replace(/,\s*\]/g,']').replace(/,\s*\}/g,'}');
+try{const t=JSON.parse(clean);if(Array.isArray(t)&&t.length>0)parsed=t;}catch(e){}
+}
+if(!parsed)throw new Error('inv');
 estado.perguntas=parsed;estado.qAtual=0;estado.acertos=0;
 showQ();show('s-perguntas');
-}catch(e){mostrarErro('Erro ao gerar perguntas','Tente novamente.',irPerguntas);}
+}catch(e){mostrarErro('Erro ao gerar perguntas','A IA teve dificuldade em gerar as perguntas. Tente novamente.',irPerguntas);}
 }
 
 function showQ(){
